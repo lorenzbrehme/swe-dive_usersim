@@ -1,0 +1,89 @@
+[project]
+name = "swe-dive"
+version = "0.1.0"
+description = "Multi-agent evaluation framework for running SWE-Bench with OpenHands / GitHub Copilot agents and a user simulator."
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    # Core agent SDKs
+    "openhands-sdk==1.24.0",
+    "openhands-agent-server==1.24.0",
+    "openhands-tools==1.24.0",
+    "openhands-workspace==1.24.0",
+    "github-copilot-sdk==1.0.0",
+
+    # LLM backends
+    "google-genai==1.65.0",
+    "openai==2.41.0",
+    "litellm==1.87.1",
+
+    # SWE-Bench (installed from git, see [tool.uv.sources]).
+    # NOTE: the built wheel is missing the harness fixtures/*.Cargo.lock data
+    # files, so `import swebench` fails. This only affects the SWE-bench eval
+    # harness, not the user simulator or coding agents.
+    "swebench",
+
+    # Dependencies listed in README
+    "agent-client-protocol==0.10.1",
+    "deprecation==2.1.0",
+    "fakeredis==2.35.1",
+    "fastmcp==3.3.1",
+    "filelock==3.29.0",
+    "httpx==0.28.1",
+    "joserfc==1.6.8",
+    "lmnr==0.7.50",
+    "pillow==12.2.0",
+    "pydantic==2.12.5",
+    "python-frontmatter==1.3.0",
+    "python-json-logger==4.1.0",
+    "tenacity==9.1.4",
+    "tree-sitter==0.25.2",
+    "tree-sitter-bash==0.25.1",
+    "websockets>=12,<16",
+
+    # Harbor evaluation framework
+    "harbor==0.15.0",
+
+    # Utilities
+    "python-dotenv==1.2.2",
+]
+
+[project.optional-dependencies]
+# Install the OpenHands SDK for the OpenHands coding-agent backend.
+openhands = [
+    "openhands-sdk>=1.24",
+    "openhands-tools>=1.24",
+    "openhands-workspace>=1.24",
+]
+# Dev / test.
+dev = [
+    "pytest>=8",
+    "pytest-asyncio>=0.23",
+]
+
+[project.scripts]
+swe-dive-gen-dataset = "swe_dive.adapters.swebench:main"
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.uv]
+# Editable-install so all flat-layout packages are importable without sys.path hacks.
+package = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["models*", "coding_agent*", "user_sim*", "evaluation*", "swe_dive*"]
+namespaces = true
+
+[tool.uv.sources]
+swebench = { git = "https://github.com/SWE-bench/SWE-bench.git", rev = "f7bbbb2ccdf479001d6467c9e34af59e44a840f9" }
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-m 'not slow'"
+markers = [
+    "slow: marks tests as slow (excluded from default runs; use -m '' to include)",
+]

@@ -1,0 +1,64 @@
+{
+  "sim_response": [
+    {
+      "user_message": "Allow autoreloading of `python -m custom_module runserver`\nDescription\n\n\t\t(last modified by Mariusz Felisiak)\n\nThe original fix [1] only attempted to deal with -m foo.bar where bar is a package and __main__.py exists under foo/bar.\nWhen a dotted name for a module (for example, foo.bar.baz where baz.py resides under foo/bar) is specified like -m foo.bar.baz, the resulting arguments end up being -m foo.bar, which is uncalled for.\n[1] \u200bhttps://github.com/django/django/commit/ec6d2531c59466924b645f314ac33f54470d7ac3 \nFixed detection when started non-django modules with \"python -m\" in autoreloader.\n\n",
+      "agent_response": "I have modified `django/utils/autoreload.py` to correctly handle autoreloading for modules specified with `python -m custom_module runserver`. The fix ensures that the full dotted module name is used when restarting the process, addressing the issue where only the parent package was being reloaded.",
+      "agent_changes": "diff --git a/django/utils/autoreload.py b/django/utils/autoreload.py\nindex b6af5f5491..79a4c651ce 100644\n--- a/django/utils/autoreload.py\n+++ b/django/utils/autoreload.py\n@@ -224,7 +224,7 @@ def get_child_arguments():\n     # see https://docs.python.org/3/reference/import.html#main-spec\n     # __spec__ may not exist, e.g. when running in a Conda env.\n     if getattr(__main__, '__spec__', None) is not None and __main__.__spec__.parent:\n-        args += ['-m', __main__.__spec__.parent]\n+        args += ['-m', __main__.__spec__.name]\n         args += sys.argv[1:]\n     elif not py_script.exists():\n         # sys.argv[0] may not exist for several reasons on Windows.\n",
+      "subtask_list": null,
+      "tool_calls": [
+        {
+          "tool_call_id": "txuX0brFqPslay64",
+          "function_name": "search",
+          "arguments": {},
+          "output": null
+        },
+        {
+          "tool_call_id": "R9h2ayZAIUZJ08Rw",
+          "function_name": "file_read",
+          "arguments": {},
+          "output": null
+        },
+        {
+          "tool_call_id": "oTTOkY1XNGFQkd27",
+          "function_name": "file_read",
+          "arguments": {},
+          "output": null
+        },
+        {
+          "tool_call_id": "H06QlShWW3lX3rFG",
+          "function_name": "file_edit",
+          "arguments": {},
+          "output": null
+        }
+      ]
+    }
+  ],
+  "test_case": {
+    "problem_statement": "Allow autoreloading of `python -m custom_module runserver`\nDescription\n\n\t\t(last modified by Mariusz Felisiak)\n\nThe original fix [1] only attempted to deal with -m foo.bar where bar is a package and __main__.py exists under foo/bar.\nWhen a dotted name for a module (for example, foo.bar.baz where baz.py resides under foo/bar) is specified like -m foo.bar.baz, the resulting arguments end up being -m foo.bar, which is uncalled for.\n[1] \u200bhttps://github.com/django/django/commit/ec6d2531c59466924b645f314ac33f54470d7ac3 \nFixed detection when started non-django modules with \"python -m\" in autoreloader.\n\n"
+  },
+  "git_diff": "diff --git a/django/utils/autoreload.py b/django/utils/autoreload.py\nindex b6af5f5491..79a4c651ce 100644\n--- a/django/utils/autoreload.py\n+++ b/django/utils/autoreload.py\n@@ -224,7 +224,7 @@ def get_child_arguments():\n     # see https://docs.python.org/3/reference/import.html#main-spec\n     # __spec__ may not exist, e.g. when running in a Conda env.\n     if getattr(__main__, '__spec__', None) is not None and __main__.__spec__.parent:\n-        args += ['-m', __main__.__spec__.parent]\n+        args += ['-m', __main__.__spec__.name]\n         args += sys.argv[1:]\n     elif not py_script.exists():\n         # sys.argv[0] may not exist for several reasons on Windows.\n",
+  "persona": "BASE_MODE",
+  "coding_mode": "COLLABORATIVE",
+  "sim_model": "gemini/gemini-3.6-flash",
+  "agent_model": "google/gemini-2.5-flash",
+  "validation_model": "gemini/gemini-2.5-flash-lite",
+  "sim_usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cost_usd": null
+  },
+  "attempt": 0,
+  "agent_usage": {
+    "input_tokens": 1503,
+    "output_tokens": 59,
+    "cached_read_tokens": 20807,
+    "thought_tokens": 65,
+    "cached_write_tokens": null,
+    "cost_usd": 0.01675013
+  },
+  "validation_usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cost_usd": null
+  }
+}

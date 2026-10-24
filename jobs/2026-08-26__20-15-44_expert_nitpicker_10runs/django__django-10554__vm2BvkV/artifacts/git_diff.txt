@@ -1,0 +1,28 @@
+diff --git a/django/db/models/sql/compiler.py b/django/db/models/sql/compiler.py
+index a791908caf..ad58b98029 100644
+--- a/django/db/models/sql/compiler.py
++++ b/django/db/models/sql/compiler.py
+@@ -50,6 +50,11 @@ class SQLCompiler:
+         might not have all the pieces in place at that time.
+         """
+         self.setup_query()
++        if self.query.combinator and self.query.has_select_fields:
++            # Clear ordering for combinator queries with explicit select fields.
++            # This prevents "ORDER BY position N is not in select list" errors
++            # when .values() or .values_list() are used on a combined queryset.
++            self.query.clear_ordering(force_empty=True)
+         order_by = self.get_order_by()
+         self.where, self.having = self.query.where.split_having()
+         extra_select = self.get_extra_select(order_by, self.select)
+diff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py
+index 08d7faf194..c0f3d3fd62 100644
+--- a/django/db/models/sql/query.py
++++ b/django/db/models/sql/query.py
+@@ -1858,6 +1858,7 @@ class Query(BaseExpression):
+         if force_empty:
+             self.default_ordering = False
+ 
++
+     def set_group_by(self):
+         """
+         Expand the GROUP BY clause required by the query.

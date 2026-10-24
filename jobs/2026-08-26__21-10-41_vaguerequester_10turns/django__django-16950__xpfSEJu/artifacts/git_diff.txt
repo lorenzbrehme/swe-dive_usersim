@@ -1,0 +1,40 @@
+diff --git a/django/forms/models.py b/django/forms/models.py
+index 3fa04b821f..51c2c4b699 100644
+--- a/django/forms/models.py
++++ b/django/forms/models.py
+@@ -4,6 +4,8 @@ and database field objects.
+ """
+ from itertools import chain
+ 
++from django.db import models
++
+ from django.core.exceptions import (
+     NON_FIELD_ERRORS,
+     FieldError,
+@@ -1351,10 +1353,23 @@ class InlineForeignKeyField(Field):
+         self.pk_field = pk_field
+         self.to_field = to_field
+         if self.parent_instance is not None:
+-            if self.to_field:
+-                kwargs["initial"] = getattr(self.parent_instance, self.to_field)
++            if self.parent_instance.pk is None:
++                if self.to_field:
++                    to_field_obj = self.parent_instance._meta.get_field(self.to_field)
++                    if isinstance(to_field_obj, models.UUIDField) and to_field_obj.has_default():
++                        kwargs["initial"] = to_field_obj.get_default()
++                    else:
++                        kwargs["initial"] = getattr(self.parent_instance, self.to_field)
++                else:
++                    if isinstance(self.parent_instance._meta.pk, models.UUIDField) and self.parent_instance._meta.pk.has_default():
++                        kwargs["initial"] = self.parent_instance._meta.pk.get_default()
++                    else:
++                        kwargs["initial"] = self.parent_instance.pk
+             else:
+-                kwargs["initial"] = self.parent_instance.pk
++                if self.to_field:
++                    kwargs["initial"] = getattr(self.parent_instance, self.to_field)
++                else:
++                    kwargs["initial"] = self.parent_instance.pk
+         kwargs["required"] = False
+         super().__init__(*args, **kwargs)
+ 

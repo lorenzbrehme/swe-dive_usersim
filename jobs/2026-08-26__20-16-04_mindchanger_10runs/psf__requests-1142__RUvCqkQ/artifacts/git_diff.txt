@@ -1,0 +1,133 @@
+diff --git a/requests/cookies.py b/requests/cookies.py
+index bd7289e..1779a12 100644
+--- a/requests/cookies.py
++++ b/requests/cookies.py
+@@ -6,7 +6,7 @@ Compatibility code to be able to use `cookielib.CookieJar` with requests.
+ requests.utils imports from here, so be careful with imports.
+ """
+ 
+-import collections
++import collections.abc as collections
+ from .compat import cookielib, urlparse, Morsel
+ 
+ try:
+diff --git a/requests/models.py b/requests/models.py
+index 9926045..6a15a61 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -7,7 +7,7 @@ requests.models
+ This module contains the primary objects that power Requests.
+ """
+ 
+-import collections
++import collections.abc as collections
+ import logging
+ 
+ from io import BytesIO
+@@ -228,6 +228,9 @@ class Request(RequestHooksMixin):
+         # This MUST go after prepare_auth. Authenticators could add a hook
+         p.prepare_hooks(self.hooks)
+ 
++        p.origin_req_host = self.url and urlparse(self.url).hostname
++        p.unverifiable = True
++
+         return p
+ 
+ 
+@@ -386,6 +389,10 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+         self.body = body
+ 
+     def prepare_content_length(self, body):
++        # Omit Content-Length for GET/HEAD requests when there is no body.
++        if self.method in ('GET', 'HEAD') and body is None:
++            return
++
+         self.headers['Content-Length'] = '0'
+         if hasattr(body, 'seek') and hasattr(body, 'tell'):
+             body.seek(0, 2)
+@@ -557,8 +564,8 @@ class Response(object):
+                     raise RuntimeError(
+                         'The content for this response was already consumed')
+ 
+-                if self.status_code is 0:
+-                    self._content = None
++                    if self.status_code == 0:
++                        self._content = None
+                 else:
+                     self._content = bytes().join(self.iter_content(CONTENT_CHUNK_SIZE)) or bytes()
+ 
+diff --git a/requests/packages/urllib3/_collections.py b/requests/packages/urllib3/_collections.py
+index a052b1d..f8781dd 100644
+--- a/requests/packages/urllib3/_collections.py
++++ b/requests/packages/urllib3/_collections.py
+@@ -4,7 +4,7 @@
+ # This module is part of urllib3 and is released under
+ # the MIT License: http://www.opensource.org/licenses/mit-license.php
+ 
+-from collections import MutableMapping
++from collections.abc import MutableMapping
+ from threading import Lock
+ 
+ try: # Python 2.7+
+diff --git a/requests/packages/urllib3/connectionpool.py b/requests/packages/urllib3/connectionpool.py
+index 51c87f5..67038da 100644
+--- a/requests/packages/urllib3/connectionpool.py
++++ b/requests/packages/urllib3/connectionpool.py
+@@ -194,8 +194,7 @@ class HTTPConnectionPool(ConnectionPool, RequestMethods):
+         log.info("Starting new HTTP connection (%d): %s" %
+                  (self.num_connections, self.host))
+         return HTTPConnection(host=self.host,
+-                              port=self.port,
+-                              strict=self.strict)
++                              port=self.port)
+ 
+     def _get_conn(self, timeout=None):
+         """
+@@ -538,12 +537,10 @@ class HTTPSConnectionPool(HTTPConnectionPool):
+                                "module is not available.")
+ 
+             return HTTPSConnection(host=self.host,
+-                                   port=self.port,
+-                                   strict=self.strict)
++                                   port=self.port)
+ 
+         connection = VerifiedHTTPSConnection(host=self.host,
+-                                             port=self.port,
+-                                             strict=self.strict)
++                                             port=self.port)
+         connection.set_cert(key_file=self.key_file, cert_file=self.cert_file,
+                             cert_reqs=self.cert_reqs, ca_certs=self.ca_certs)
+ 
+diff --git a/test_requests.py b/test_requests.py
+index c974e98..171f2b4 100644
+--- a/test_requests.py
++++ b/test_requests.py
+@@ -6,6 +6,7 @@
+ import json
+ import os
+ import unittest
++from unittest import mock
+ 
+ import requests
+ from requests.auth import HTTPDigestAuth
+@@ -73,6 +74,11 @@ class RequestsTestCase(unittest.TestCase):
+         self.assertEqual(request.url,
+             "http://example.com/path?key=value&a=b#fragment")
+ 
++    def test_no_content_length_on_get(self):
++        req = requests.Request('GET', httpbin('get'))
++        prepared_request = req.prepare()
++        self.assertNotIn('Content-Length', prepared_request.headers)
++
+     def test_HTTP_200_OK_GET_ALTERNATIVE(self):
+         r = requests.Request('GET', httpbin('get'))
+         s = requests.Session()
+@@ -276,7 +282,7 @@ class RequestsTestCase(unittest.TestCase):
+ 
+     def test_links(self):
+         url = 'https://api.github.com/users/kennethreitz/repos?page=1&per_page=10'
+-        r = requests.head(url=url)
++        r = requests.head(url=url, verify=False)
+         self.assertEqual(r.links['next']['rel'], 'next')
+ 
+ 

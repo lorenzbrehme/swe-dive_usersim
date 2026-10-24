@@ -1,0 +1,26 @@
+name: Unit tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+# Non-blocking: failures are reported but never prevent merging.
+# To make this required, add the job name to the repo's branch protection rules.
+jobs:
+  test:
+    name: pytest (fast)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dev dependencies
+        run: uv sync --extra dev
+
+      - name: Run tests
+        run: uv run pytest -m '' --tb=short -v

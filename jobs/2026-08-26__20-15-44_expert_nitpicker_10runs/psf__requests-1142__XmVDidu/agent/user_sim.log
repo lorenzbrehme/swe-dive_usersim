@@ -1,0 +1,9 @@
+── Turn 1/10 ──  message: It looks like `PreparedRequest.prepare_content_length` in `requests/models.py` is setting a `Content-Length` header even when there's no request body. Can you update `prepare_content_length` so it skips setting `Content-Length` if `self.body` is `None`?
+[AGENT_RESP] I've updated `requests/models.py` to prevent `Content-Length` from being set when `self.body` is `None`.
+── Turn 2/10 ──  message: In `prepare_content_length`, returning early for any `body is None` breaks POST and PUT requests that need `Content-Length: 0`. Let's only skip setting `Content-Length` if `self.method` is in `('GET', 'HEAD')` and `body is None`.
+[AGENT_RESP] I've updated `prepare_content_length` in `requests/models.py`. It will now only skip setting the `Content-Length` header if `self.body` is `None` and `self.method` is either `GET` or `HEAD`.
+── Turn 1/10 ──  message: In `requests/models.py`, look at `prepare_content_length`. We shouldn't be automatically adding a `Content-Length` header when the request method is GET and there's no body.
+[AGENT_RESP] The `prepare_content_length` function in `requests/models.py` has been updated. The `Content-Length` header will no longer be automatically added for GET requests that do not have a body.
+── Turn 2/10 ──  message: Include HEAD in that check as well, and use `body is None` instead of `not body`. Also lose the unnecessary parentheses.
+[AGENT_RESP] I've updated the `prepare_content_length` method in `requests/models.py` to include 'HEAD' requests in the check and use `body is None`. The unnecessary parentheses have also been removed.
+[DONE] Simulator satisfied — ending after turn 2.

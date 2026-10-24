@@ -1,0 +1,40 @@
+── BASE_MODE ── running standard benchmark task (single turn).
+[AGENT_RESP] The `FieldError` you encountered ("Field cannot be both deferred and traversed using select_related at the same time") arises because Django's serializer, when processing the many-to-many relationship, performs query optimizations (like `only('pk')`) on the related `TestTag` objects. This conflicts with your `TestTagManager` which eagerly loads the `master` field using `select_related`.
+
+While I couldn't precisely replicate the `serializers.serialize` failure with the `depth` parameter in my environment (likely due to a Django version difference causing `depth` to be ignored or handled differently, leading to a `JSONEncoder` error), I did successfully reproduce the core `FieldError` by manually constructing a conflicting queryset. This confirms the underlying issue.
+
+Your proposed workaround is indeed the correct solution. By explicitly defining `default = models.Manager()` as the first manager on `TestTag`, you ensure that the `RelatedManager` (which Django's serializer uses to fetch related objects for many-to-many fields) uses a simple manager without the `select_related("master")` clause. Your `TestTagManager` with `select_related` will still be available via `TestTag.objects` for cases where you explicitly need that prefetching.
+
+Here's the corrected `test_app/models.py`:
+```python
+from django.db import models
+from django.db.models import Manager
+
+class TestTagManager(Manager):
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.select_related("master") # follow master when retrieving object by default
+        return qs
+
+class TestTagMaster(models.Model):
+    name = models.CharField(max_length=120)
+
+    def __str__(self):
+        return self.name
+
+class TestTag(models.Model):
+    default = Manager() # Fix: define custom default manager, which is used by RelatedManager
+    objects = TestTagManager()
+    name = models.CharField(max_length=120)
+    master = models.ForeignKey(TestTagMaster, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.name
+
+class Test(models.Model):
+    name = models.CharField(max_length=120)
+    tags = models.ManyToManyField(TestTag, blank=True)
+
+    def __str__(self):
+        return self.name
+```

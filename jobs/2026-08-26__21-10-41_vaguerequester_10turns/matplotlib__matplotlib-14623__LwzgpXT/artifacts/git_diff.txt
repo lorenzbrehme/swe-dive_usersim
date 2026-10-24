@@ -1,0 +1,140 @@
+diff --git a/log_axis_inversion_test.py b/log_axis_inversion_test.py
+new file mode 100644
+index 000000000..3390a82ef
+--- /dev/null
++++ b/log_axis_inversion_test.py
+@@ -0,0 +1,39 @@
++import matplotlib.pyplot as plt
++import numpy as np
++
++def test_log_axis_inversion(ax, axis_name, set_lim_func, get_lim_func):
++    data = np.exp(np.arange(1, 10))
++
++    if axis_name == 'x':
++        set_lim_func(ax, data.max(), data.min())
++        ax.plot(data, np.ones_like(data))
++        ax.set_xscale('log')
++    else:
++        set_lim_func(ax, data.max(), data.min())
++        ax.plot(np.ones_like(data), data)
++        ax.set_yscale('log')
++
++    inverted_lims = get_lim_func(ax)
++    # Check if the limits are indeed inverted
++    assert inverted_lims[0] > inverted_lims[1], f"{axis_name}-axis limits are not inverted: {inverted_lims}"
++
++    # Check if ticks are also inverted (visually, this means labels should be in descending order)
++    # This is a bit harder to programmatically check without rendering, but we can check the order of numerical ticks
++    if axis_name == 'x':
++        ticks = ax.get_xticks()
++    else:
++        ticks = ax.get_yticks()
++    
++    # The numerical values of ticks should be in descending order if the axis is inverted
++    assert np.all(np.diff(ticks) < 0), f"{axis_name}-axis ticks are not in descending order: {ticks}"
++
++    print(f"Log {axis_name}-axis inversion test passed. Limits: {inverted_lims}, Ticks: {ticks}")
++
++
++fig_x, ax_x = plt.subplots()
++test_log_axis_inversion(ax_x, 'x', lambda ax, l, r: ax.set_xlim(l, r), lambda ax: ax.get_xlim())
++
++fig_y, ax_y = plt.subplots()
++test_log_axis_inversion(ax_y, 'y', lambda ax, b, t: ax.set_ylim(b, t), lambda ax: ax.get_ylim())
++
++plt.show()
+diff --git a/log_ylim_test.py b/log_ylim_test.py
+new file mode 100644
+index 000000000..7e6b29524
+--- /dev/null
++++ b/log_ylim_test.py
+@@ -0,0 +1,18 @@
++import matplotlib.pyplot as plt
++import numpy as np
++
++fig, ax = plt.subplots()
++
++x = np.arange(0, 10, 0.1)
++y = np.exp(x)
++
++ax.plot(x, y)
++ax.set_yscale('log')
++ax.set_title('Log Scale Inversion Test')
++ax.set_ylabel('Y-axis (log scale)')
++ax.set_xlabel('X-axis')
++
++# Attempt to invert the y-axis
++ax.set_ylim(y.max(), y.min())
++
++plt.show()
+diff --git a/log_ylim_test_debug.py b/log_ylim_test_debug.py
+new file mode 100644
+index 000000000..fa174b3ac
+--- /dev/null
++++ b/log_ylim_test_debug.py
+@@ -0,0 +1,29 @@
++import matplotlib.pyplot as plt
++import numpy as np
++
++fig, ax = plt.subplots()
++
++x = np.arange(0, 10, 0.1)
++y = np.exp(x)
++
++ax.plot(x, y)
++ax.set_yscale('log')
++ax.set_title('Log Scale Inversion Test')
++ax.set_ylabel('Y-axis (log scale)')
++ax.set_xlabel('X-axis')
++
++print(f"Before set_ylim: yscale={ax.get_yscale()}, ylim={ax.get_ylim()}")
++
++# Attempt to invert the y-axis
++ax.set_ylim(y.max(), y.min())
++
++print(f"After set_ylim(max, min): yscale={ax.get_yscale()}, ylim={ax.get_ylim()}")
++
++# Now try the workaround
++ax.set_ylim(y.min(), y.max())
++ax.invert_yaxis()
++
++print(f"After set_ylim(min, max) and invert_yaxis(): yscale={ax.get_yscale()}, ylim={ax.get_ylim()}")
++
++
++plt.show()
+diff --git a/log_ylim_tick_test.py b/log_ylim_tick_test.py
+new file mode 100644
+index 000000000..86d2a6b85
+--- /dev/null
++++ b/log_ylim_tick_test.py
+@@ -0,0 +1,30 @@
++import matplotlib.pyplot as plt
++import numpy as np
++
++fig, ax = plt.subplots()
++
++x = np.arange(1, 10, 1)
++y = np.array([10, 100, 1000, 1, 10, 100, 1000, 10, 1])
++
++ax.plot(x, y, marker='o')
++ax.set_yscale('log')
++ax.set_title('Log Scale Inversion Test with Ticks')
++ax.set_ylabel('Y-axis (log scale)')
++ax.set_xlabel('X-axis')
++
++print(f"Before set_ylim: yscale={ax.get_yscale()}, ylim={ax.get_ylim()}")
++
++# Attempt to invert the y-axis
++current_ylim = ax.get_ylim()
++ax.set_ylim(current_ylim[1], current_ylim[0]) # Invert the current limits
++
++print(f"After set_ylim(max, min): yscale={ax.get_yscale()}, ylim={ax.get_ylim()}")
++
++# Get major tick locations and labels
++major_locs = ax.get_yticks(minor=False)
++major_labels = [label.get_text() for label in ax.get_yticklabels(minor=False)]
++
++print(f"Major Y-tick locations: {major_locs}")
++print(f"Major Y-tick labels: {major_labels}")
++
++plt.show()

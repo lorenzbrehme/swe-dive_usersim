@@ -1,0 +1,23 @@
+[
+  {
+    "source": "/testbed",
+    "destination": "artifacts/git_diff.txt",
+    "type": "file",
+    "status": "ok",
+    "service": null
+  },
+  {
+    "source": "/logs/agent/conversation.json",
+    "destination": "artifacts/conversation.json",
+    "type": "file",
+    "status": "ok",
+    "service": null
+  },
+  {
+    "source": "/logs/artifacts",
+    "destination": "artifacts/logs/artifacts",
+    "type": "directory",
+    "status": "empty",
+    "service": null
+  }
+]

@@ -1,0 +1,67 @@
+{
+    "task": {
+        "path": null,
+        "git_url": null,
+        "git_commit_id": null,
+        "name": "swe-bench/psf__requests-1142",
+        "ref": "sha256:24359408df5948c741ac080425763ca4e1250b0ad1e7079e5f865e10db491fe4",
+        "overwrite": false,
+        "download_dir": null,
+        "source": "swe-bench/swe-bench-verified"
+    },
+    "trial_name": "psf__requests-1142__MNBppxV",
+    "trials_dir": "jobs/2026-08-26__21-10-41",
+    "timeout_multiplier": 1.0,
+    "agent_timeout_multiplier": null,
+    "verifier_timeout_multiplier": null,
+    "agent_setup_timeout_multiplier": null,
+    "environment_build_timeout_multiplier": null,
+    "agent": {
+        "name": "swe-dive-user-sim-acp/opencode",
+        "import_path": "swe_dive.harbor_agents.user_sim_agent:UserSimAcpAgent",
+        "model_name": "gemini/gemini-2.5-flash",
+        "skills": [],
+        "override_timeout_sec": null,
+        "override_setup_timeout_sec": null,
+        "max_timeout_sec": null,
+        "extra_allowed_hosts": [],
+        "kwargs": {
+            "registry_spec": "acp:opencode",
+            "persona": "Vague_Requester",
+            "coding_mode": "COLLABORATIVE",
+            "max_turns": 10,
+            "sim_model": "gemini/gemini-3.6-flash",
+            "validation_model": "gemini/gemini-2.5-flash-lite",
+            "agent_model": "gemini/gemini-2.5-flash"
+        },
+        "env": {},
+        "mcp_servers": []
+    },
+    "environment": {
+        "type": "docker",
+        "import_path": null,
+        "force_build": false,
+        "delete": true,
+        "cpu_enforcement_policy": "auto",
+        "memory_enforcement_policy": "auto",
+        "override_cpus": null,
+        "override_memory_mb": null,
+        "override_storage_mb": null,
+        "override_gpus": null,
+        "override_tpu": null,
+        "mounts": null,
+        "extra_docker_compose": [],
+        "env": {},
+        "kwargs": {},
+        "extra_allowed_hosts": []
+    },
+    "verifier": {
+        "override_timeout_sec": null,
+        "max_timeout_sec": null,
+        "env": {},
+        "disable": false
+    },
+    "artifacts": [],
+    "extra_instruction_paths": [],
+    "job_id": "ae0a296c-4658-45ad-af45-55253fdc29dc"
+}

@@ -1,0 +1,118 @@
+{
+    "id": "07fd1f98-ea3d-46a0-9321-cc809470c1be",
+    "task_name": "swe-bench/sympy__sympy-16886",
+    "trial_name": "sympy__sympy-16886__WDqZ62R",
+    "trial_uri": "file:///home/lorenz/swe-dive/jobs/2026-08-28__09-09-11/sympy__sympy-16886__WDqZ62R",
+    "task_id": {
+        "org": "swe-bench",
+        "name": "sympy__sympy-16886",
+        "ref": "sha256:15b612738dbf2fa5b04bca63af1fcec35a1cb82d214d80dfe471885e053e8abe"
+    },
+    "source": "swe-bench/swe-bench-verified",
+    "task_checksum": "5da2757420e0c863cf0b9074ca7089008cfbf75b87114ee9d5a42774f97fa2c0",
+    "config": {
+        "task": {
+            "path": null,
+            "git_url": null,
+            "git_commit_id": null,
+            "name": "swe-bench/sympy__sympy-16886",
+            "ref": "sha256:15b612738dbf2fa5b04bca63af1fcec35a1cb82d214d80dfe471885e053e8abe",
+            "overwrite": false,
+            "download_dir": null,
+            "source": "swe-bench/swe-bench-verified"
+        },
+        "trial_name": "sympy__sympy-16886__WDqZ62R",
+        "trials_dir": "jobs/2026-08-28__09-09-11",
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "swe-dive-user-sim-acp/opencode",
+            "import_path": "swe_dive.harbor_agents.user_sim_agent:UserSimAcpAgent",
+            "model_name": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {
+                "registry_spec": "acp:opencode",
+                "persona": "BASE_MODE",
+                "coding_mode": "COLLABORATIVE",
+                "max_turns": 10,
+                "sim_model": "gemini/gemini-3.6-flash",
+                "validation_model": "gemini/gemini-2.5-flash-lite",
+                "agent_model": "gemini/gemini-2.5-flash"
+            },
+            "env": {},
+            "mcp_servers": []
+        },
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "env": {},
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "env": {},
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "job_id": "ea2a623b-827a-43db-8b87-cec7baf997e5"
+    },
+    "agent_info": {
+        "name": "swe-dive-user-sim-acp/opencode",
+        "version": "1.18.23",
+        "model_info": null
+    },
+    "agent_result": {
+        "n_input_tokens": null,
+        "n_cache_tokens": null,
+        "n_output_tokens": null,
+        "cost_usd": null,
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 1.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-08-28T07:09:14.989625Z",
+    "finished_at": "2026-08-28T07:19:20.457444Z",
+    "environment_setup": {
+        "started_at": "2026-08-28T07:09:15.114333Z",
+        "finished_at": "2026-08-28T07:11:02.344485Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-08-28T07:11:02.344583Z",
+        "finished_at": "2026-08-28T07:13:41.932400Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-08-28T07:13:41.932556Z",
+        "finished_at": "2026-08-28T07:18:13.668537Z"
+    },
+    "verifier": {
+        "started_at": "2026-08-28T07:18:15.596003Z",
+        "finished_at": "2026-08-28T07:19:00.447394Z"
+    },
+    "step_results": null
+}

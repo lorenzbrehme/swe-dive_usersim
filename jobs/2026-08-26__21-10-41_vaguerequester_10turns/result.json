@@ -1,0 +1,54 @@
+{
+    "id": "ae0a296c-4658-45ad-af45-55253fdc29dc",
+    "started_at": "2026-08-26T21:10:43.985205",
+    "updated_at": "2026-08-26T22:38:31.789321",
+    "finished_at": "2026-08-26T22:38:31.789321",
+    "n_total_trials": 10,
+    "stats": {
+        "n_completed_trials": 10,
+        "n_errored_trials": 1,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "swe-dive-user-sim-acp/opencode__gemini-2.5-flash__swe-bench/swe-bench-verified": {
+                "n_trials": 10,
+                "n_errors": 1,
+                "metrics": [
+                    {
+                        "mean": 0.3
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "0.0": [
+                            "matplotlib__matplotlib-14623__LwzgpXT",
+                            "django__django-10554__9FsYmAS",
+                            "django__django-16950__xpfSEJu",
+                            "django__django-16032__WC3AdmW",
+                            "pytest-dev__pytest-7236__TXsWPy2",
+                            "django__django-14311__6pDbm4d",
+                            "matplotlib__matplotlib-22865__rXY8NFP"
+                        ],
+                        "1.0": [
+                            "django__django-16938__SQTtw3S",
+                            "sympy__sympy-16886__VA2Nx9S",
+                            "psf__requests-1142__MNBppxV"
+                        ]
+                    }
+                },
+                "exception_stats": {
+                    "NonZeroAgentExitCodeError": [
+                        "django__django-16938__SQTtw3S"
+                    ]
+                }
+            }
+        },
+        "n_input_tokens": 258073,
+        "n_cache_tokens": null,
+        "n_output_tokens": 24114,
+        "cost_usd": 0.217963875
+    }
+}

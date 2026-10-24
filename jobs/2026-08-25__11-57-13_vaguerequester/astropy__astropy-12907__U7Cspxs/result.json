@@ -1,0 +1,118 @@
+{
+    "id": "8fa2ded2-9fad-41de-a3d3-abab829092c5",
+    "task_name": "swe-bench/astropy__astropy-12907",
+    "trial_name": "astropy__astropy-12907__U7Cspxs",
+    "trial_uri": "file:///home/lorenz/swe-dive/jobs/2026-08-25__11-57-13/astropy__astropy-12907__U7Cspxs",
+    "task_id": {
+        "org": "swe-bench",
+        "name": "astropy__astropy-12907",
+        "ref": "sha256:ffa0f9b1e9f60875cb046c42c272b0edb869533362d026f1524a4ae216fbd336"
+    },
+    "source": "swe-bench/swe-bench-verified",
+    "task_checksum": "9905d2502490ff795747789fa729c227080589f676bce62243a2761fef0f6fa3",
+    "config": {
+        "task": {
+            "path": null,
+            "git_url": null,
+            "git_commit_id": null,
+            "name": "swe-bench/astropy__astropy-12907",
+            "ref": "sha256:ffa0f9b1e9f60875cb046c42c272b0edb869533362d026f1524a4ae216fbd336",
+            "overwrite": false,
+            "download_dir": null,
+            "source": "swe-bench/swe-bench-verified"
+        },
+        "trial_name": "astropy__astropy-12907__U7Cspxs",
+        "trials_dir": "jobs/2026-08-25__11-57-13",
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "swe-dive-user-sim-acp/opencode",
+            "import_path": "swe_dive.harbor_agents.user_sim_agent:UserSimAcpAgent",
+            "model_name": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {
+                "registry_spec": "acp:opencode",
+                "persona": "Vague_Requester",
+                "coding_mode": "COLLABORATIVE",
+                "max_turns": 10,
+                "sim_model": "gemini/gemini-3.6-flash",
+                "validation_model": "gemini/gemini-2.5-flash-lite",
+                "agent_model": "gemini/gemini-2.5-flash"
+            },
+            "env": {},
+            "mcp_servers": []
+        },
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "env": {},
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "env": {},
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "job_id": "b98aec55-6005-40ee-b95d-1c44bc5cb6b4"
+    },
+    "agent_info": {
+        "name": "swe-dive-user-sim-acp/opencode",
+        "version": "1.18.23",
+        "model_info": null
+    },
+    "agent_result": {
+        "n_input_tokens": 22573,
+        "n_cache_tokens": null,
+        "n_output_tokens": 2293,
+        "cost_usd": 0.025528500000000003,
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-08-25T09:57:16.395502Z",
+    "finished_at": "2026-08-25T10:17:22.501032Z",
+    "environment_setup": {
+        "started_at": "2026-08-25T09:57:16.427930Z",
+        "finished_at": "2026-08-25T09:57:22.487039Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-08-25T09:57:22.487092Z",
+        "finished_at": "2026-08-25T09:58:21.884102Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-08-25T09:58:21.884342Z",
+        "finished_at": "2026-08-25T10:14:53.174814Z"
+    },
+    "verifier": {
+        "started_at": "2026-08-25T10:14:54.026395Z",
+        "finished_at": "2026-08-25T10:17:07.592670Z"
+    },
+    "step_results": null
+}

@@ -1,0 +1,101 @@
+# Environment variables
+.env
+.env2
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+swe_dive/.venv/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+# /jobs/*/
+# /logs/*.jsonl
+# /conversations/*.json
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+data/
+# API keys and secrets
+secrets.json
+credentials.json
+
+# Temporary files
+*.tmp
+*.temp
+.make
+
+# rag_to_be_tested-specific
+# Vector databases
+*.faiss
+*.index
+chroma_db/
+vectorstore/
+
+# Document embeddings
+embeddings/
+
+
+
+
+# Cache directories
+.cache/
+cache/
+
+.ragas-venv
+.ragas-venv/jobs/*/

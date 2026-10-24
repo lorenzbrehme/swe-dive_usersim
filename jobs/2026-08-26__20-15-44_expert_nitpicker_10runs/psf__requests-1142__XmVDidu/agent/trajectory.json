@@ -1,0 +1,80 @@
+{
+  "schema_version": "ATIF-v1.7",
+  "session_id": "agent",
+  "agent": {
+    "name": "swe-dive-user-sim-acp/opencode",
+    "version": "1.18.23",
+    "model_name": "google/gemini-2.5-flash"
+  },
+  "steps": [
+    {
+      "step_id": 1,
+      "source": "user",
+      "message": "In `requests/models.py`, look at `prepare_content_length`. We shouldn't be automatically adding a `Content-Length` header when the request method is GET and there's no body."
+    },
+    {
+      "step_id": 2,
+      "source": "agent",
+      "message": "The `prepare_content_length` function in `requests/models.py` has been updated. The `Content-Length` header will no longer be automatically added for GET requests that do not have a body.",
+      "tool_calls": [
+        {
+          "tool_call_id": "8BfaWyhNa7cX75Oc",
+          "function_name": "search",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "lK8OvM5vzqO8kGz0",
+          "function_name": "file_read",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "ELeKYwZCIOjQDGQH",
+          "function_name": "file_edit",
+          "arguments": {}
+        }
+      ],
+      "observation": {
+        "results": [
+          {
+            "content": "diff --git a/requests/models.py b/requests/models.py\nindex 9926045..6df5193 100644\n--- a/requests/models.py\n+++ b/requests/models.py\n@@ -386,6 +386,9 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):\n         self.body = body\n \n     def prepare_content_length(self, body):\n+        if (self.method == 'GET') and not body:\n+            return\n+\n         self.headers['Content-Length'] = '0'\n         if hasattr(body, 'seek') and hasattr(body, 'tell'):\n             body.seek(0, 2)\n"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 3,
+      "source": "user",
+      "message": "Include HEAD in that check as well, and use `body is None` instead of `not body`. Also lose the unnecessary parentheses."
+    },
+    {
+      "step_id": 4,
+      "source": "agent",
+      "message": "I've updated the `prepare_content_length` method in `requests/models.py` to include 'HEAD' requests in the check and use `body is None`. The unnecessary parentheses have also been removed.",
+      "tool_calls": [
+        {
+          "tool_call_id": "bmhPU3PpeI0LWcpd",
+          "function_name": "file_edit",
+          "arguments": {}
+        }
+      ],
+      "observation": {
+        "results": [
+          {
+            "content": "diff --git a/requests/models.py b/requests/models.py\nindex 9926045..4cf6cb7 100644\n--- a/requests/models.py\n+++ b/requests/models.py\n@@ -386,6 +386,9 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):\n         self.body = body\n \n     def prepare_content_length(self, body):\n+        if self.method in ('GET', 'HEAD') and body is None:\n+            return\n+\n         self.headers['Content-Length'] = '0'\n         if hasattr(body, 'seek') and hasattr(body, 'tell'):\n             body.seek(0, 2)\n"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 5,
+      "source": "user",
+      "message": "```json\n{\n    \"follow-up\": \"[DONE]\"\n}\n```"
+    }
+  ],
+  "final_metrics": {
+    "total_prompt_tokens": 5259,
+    "total_completion_tokens": 3288,
+    "total_cost_usd": 0.01627425,
+    "total_steps": 5
+  }
+}

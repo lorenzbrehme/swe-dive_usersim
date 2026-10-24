@@ -1,0 +1,188 @@
++ cd /testbed
++ set +x
++ python -m pip install -e .
+Obtaining file:///testbed
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Getting requirements to build editable: started
+  Getting requirements to build editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Requirement already satisfied: asgiref>=3.7.0 in /opt/miniconda3/envs/testbed/lib/python3.11/site-packages (from Django==5.0.dev20260813015201) (3.8.1)
+Requirement already satisfied: sqlparse>=0.3.1 in /opt/miniconda3/envs/testbed/lib/python3.11/site-packages (from Django==5.0.dev20260813015201) (0.5.2)
+Building wheels for collected packages: Django
+  Building editable for Django (pyproject.toml): started
+  Building editable for Django (pyproject.toml): finished with status 'done'
+  Created wheel for Django: filename=django-5.0.dev20260813015201-0.editable-py3-none-any.whl size=27659 sha256=b0a51b29e44c7cc0a4cbb9af499484aea53ff6d88038ec9d3024bbf4cca04977
+  Stored in directory: /tmp/pip-ephem-wheel-cache-2lqdzef2/wheels/49/5f/4f/01b7d31ea6ddac9643da788242d33e5fd3467d95d17b032c6b
+Successfully built Django
+Installing collected packages: Django
+  Attempting uninstall: Django
+    Found existing installation: Django 5.0.dev20230707060601
+    Uninstalling Django-5.0.dev20230707060601:
+      Successfully uninstalled Django-5.0.dev20230707060601
+Successfully installed Django-5.0.dev20260813015201
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
++ git checkout f64fd47a7627ed6ffe2df2a32ded6ee528a784eb tests/model_formsets/test_uuid.py
+Updated 0 paths from 1abf1f8f94
++ for path in tests/model_formsets/test_uuid.py
++ '[' -e tests/model_formsets/test_uuid.py ']'
++ git ls-files --error-unmatch -- tests/model_formsets/test_uuid.py
++ echo 'diff --git a/tests/model_formsets/test_uuid.py b/tests/model_formsets/test_uuid.py
+--- a/tests/model_formsets/test_uuid.py
++++ b/tests/model_formsets/test_uuid.py
+@@ -43,6 +43,8 @@ def test_inlineformset_factory_ignores_default_pks_on_submit(self):
+             }
+         )
+         self.assertTrue(formset.is_valid())
++        self.assertIsNone(formset.instance.uuid)
++        self.assertIsNone(formset.forms[0].instance.parent_id)
+
+     def test_inlineformset_factory_nulls_default_pks_uuid_parent_auto_child(self):
+         """
+@@ -91,3 +93,25 @@ def test_inlineformset_factory_nulls_default_pks_alternate_key_relation(self):
+         )
+         formset = FormSet()
+         self.assertIsNone(formset.forms[0].fields["parent"].initial)
++
++    def test_inlineformset_factory_nulls_default_pks_alternate_key_relation_data(self):
++        """
++        If form data is provided, a parent'\''s auto-generated alternate key is
++        set.
++        """
++        FormSet = inlineformset_factory(
++            ParentWithUUIDAlternateKey, ChildRelatedViaAK, fields="__all__"
++        )
++        formset = FormSet(
++            {
++                "childrelatedviaak_set-TOTAL_FORMS": 3,
++                "childrelatedviaak_set-INITIAL_FORMS": 0,
++                "childrelatedviaak_set-MAX_NUM_FORMS": "",
++                "childrelatedviaak_set-0-name": "Test",
++                "childrelatedviaak_set-1-name": "",
++                "childrelatedviaak_set-2-name": "",
++            }
++        )
++        self.assertIs(formset.is_valid(), True)
++        self.assertIsNotNone(formset.instance.uuid)
++        self.assertEqual(formset.forms[0].instance.parent_id, formset.instance.uuid)
+'
++ git apply --check /tmp/test_patch.diff
++ git apply /tmp/test_patch.diff
+++ mktemp
++ LOG_FILE=/tmp/tmp.u7ncxcPQZ1
++ export LOG_FILE
++ exec
++ exec
+++ tee /tmp/tmp.u7ncxcPQZ1
++ set +x
+Creating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+Testing against Django installed in '/testbed/django'
+Importing application model_formsets
+Found 7 test(s).
+Skipping setup of unused database(s): other.
+Operations to perform:
+  Synchronize unmigrated apps: auth, contenttypes, messages, model_formsets, sessions, staticfiles
+  Apply all migrations: admin, sites
+Synchronizing apps without migrations:
+  Creating tables...
+    Creating table django_content_type
+    Creating table auth_permission
+    Creating table auth_group
+    Creating table auth_user
+    Creating table django_session
+    Creating table model_formsets_author
+    Creating table model_formsets_betterauthor
+    Creating table model_formsets_book
+    Creating table model_formsets_bookwithcustompk
+    Creating table model_formsets_editor
+    Creating table model_formsets_bookwithoptionalalteditor
+    Creating table model_formsets_alternatebook
+    Creating table model_formsets_authormeeting
+    Creating table model_formsets_customprimarykey
+    Creating table model_formsets_place
+    Creating table model_formsets_owner
+    Creating table model_formsets_location
+    Creating table model_formsets_ownerprofile
+    Creating table model_formsets_restaurant
+    Creating table model_formsets_product
+    Creating table model_formsets_price
+    Creating table model_formsets_mexicanrestaurant
+    Creating table model_formsets_classymexicanrestaurant
+    Creating table model_formsets_repository
+    Creating table model_formsets_revision
+    Creating table model_formsets_person
+    Creating table model_formsets_membership
+    Creating table model_formsets_team
+    Creating table model_formsets_player
+    Creating table model_formsets_poet
+    Creating table model_formsets_poem
+    Creating table model_formsets_post
+    Creating table model_formsets_uuidpkparent
+    Creating table model_formsets_uuidpkchild
+    Creating table model_formsets_childwitheditablepk
+    Creating table model_formsets_autopkchildofuuidpkparent
+    Creating table model_formsets_autopkparent
+    Creating table model_formsets_uuidpkchildofautopkparent
+    Creating table model_formsets_parentwithuuidalternatekey
+    Creating table model_formsets_childrelatedviaak
+    Running deferred SQL...
+Running migrations:
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying sites.0001_initial... OK
+  Applying sites.0002_alter_domain_unique... OK
+System check identified no issues (1 silenced).
+test_inlineformset_factory_ignores_default_pks_on_submit (model_formsets.test_uuid.InlineFormsetTests.test_inlineformset_factory_ignores_default_pks_on_submit)
+#24377 - Inlines with a model field default should ignore that default ... ok
+test_inlineformset_factory_nulls_default_pks (model_formsets.test_uuid.InlineFormsetTests.test_inlineformset_factory_nulls_default_pks)
+#24377 - If we're adding a new object, a parent's auto-generated pk ... ok
+test_inlineformset_factory_nulls_default_pks_alternate_key_relation (model_formsets.test_uuid.InlineFormsetTests.test_inlineformset_factory_nulls_default_pks_alternate_key_relation)
+#24958 - Variant of test_inlineformset_factory_nulls_default_pks for ... ok
+test_inlineformset_factory_nulls_default_pks_alternate_key_relation_data (model_formsets.test_uuid.InlineFormsetTests.test_inlineformset_factory_nulls_default_pks_alternate_key_relation_data)
+If form data is provided, a parent's auto-generated alternate key is ... FAIL
+test_inlineformset_factory_nulls_default_pks_auto_parent_uuid_child (model_formsets.test_uuid.InlineFormsetTests.test_inlineformset_factory_nulls_default_pks_auto_parent_uuid_child)
+#24958 - Variant of test_inlineformset_factory_nulls_default_pks for ... ok
+test_inlineformset_factory_nulls_default_pks_child_editable_pk (model_formsets.test_uuid.InlineFormsetTests.test_inlineformset_factory_nulls_default_pks_child_editable_pk)
+#24958 - Variant of test_inlineformset_factory_nulls_default_pks for ... ok
+test_inlineformset_factory_nulls_default_pks_uuid_parent_auto_child (model_formsets.test_uuid.InlineFormsetTests.test_inlineformset_factory_nulls_default_pks_uuid_parent_auto_child)
+#24958 - Variant of test_inlineformset_factory_nulls_default_pks for ... ok
+
+======================================================================
+FAIL: test_inlineformset_factory_nulls_default_pks_alternate_key_relation_data (model_formsets.test_uuid.InlineFormsetTests.test_inlineformset_factory_nulls_default_pks_alternate_key_relation_data)
+If form data is provided, a parent's auto-generated alternate key is
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/testbed/tests/model_formsets/test_uuid.py", line 116, in test_inlineformset_factory_nulls_default_pks_alternate_key_relation_data
+    self.assertIsNotNone(formset.instance.uuid)
+AssertionError: unexpectedly None
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.013s
+
+FAILED (failures=1)
+Destroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+Updated 1 path from 1abf1f8f94
+Downloading pygments (1.2MiB)
+Downloading chardet (1.4MiB)
+Downloading aiohttp (1.7MiB)
+Downloading hf-xet (4.3MiB)
+Downloading numpy (16.1MiB)
+Downloading pyarrow (47.7MiB)
+Downloading virtualenv (5.1MiB)
+Downloading pandas (10.8MiB)
+ Downloading chardet
+ Downloading aiohttp
+ Downloading hf-xet
+ Downloading virtualenv
+ Downloading pygments
+ Downloading numpy
+ Downloading pyarrow
+ Downloading pandas
+Installed 73 packages in 320ms
+SWEBench results starts here
+FAILED
+SWEBench results ends here

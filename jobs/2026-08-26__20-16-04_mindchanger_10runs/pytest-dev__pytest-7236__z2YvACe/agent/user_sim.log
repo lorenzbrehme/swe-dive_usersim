@@ -1,0 +1,7 @@
+── Turn 1/10 ──  message: When running with `--pdb`, `unittest.TestCase.tearDown` is being called even on skipped tests. Take a look at `TestCaseFunction` in `src/_pytest/unittest.py` and modify `runtest()` so `tearDown()` is skipped if the test raised a skip outcome.
+[AGENT_RESP] I have modified `src/_pytest/unittest.py` to ensure `tearDown()` is skipped if the test raised a skip outcome when running with `--pdb`.
+── Turn 2/10 ──  message: Actually, looking at `src/_pytest/unittest.py`, hacking `tearDown` postponement feels like the wrong place to fix this. Let me change course: revert the changes in `unittest.py` and instead update `pytest_exception_interact` in `src/_pytest/debugging.py` so `--pdb` isn't invoked on skip exceptions at all.
+[AGENT_RESP] I have reverted the previous change and modified `src/_pytest/debugging.py` to prevent `--pdb` from being invoked on skip exceptions by adding a check in `pytest_exception_interact`.
+── Turn 3/10 ──  message: That check only covers pytest's `Skipped` exception. Make sure standard `unittest.SkipTest` exceptions are also checked in `pytest_exception_interact` so standard unittest skips don't trigger post-mortem pdb either.
+[AGENT_RESP] I have updated `src/_pytest/debugging.py` to also check for `unittest.SkipTest` exceptions in `pytest_exception_interact`, ensuring that standard unittest skips do not trigger post-mortem pdb.
+[DONE] Simulator satisfied — ending after turn 3.

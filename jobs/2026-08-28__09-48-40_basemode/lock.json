@@ -1,0 +1,71 @@
+{
+    "schema_version": 1,
+    "created_at": "2026-08-28T07:48:42.914351Z",
+    "harbor": {
+        "version": "0.15.0",
+        "is_editable": false
+    },
+    "invocation": [
+        "main.py",
+        "-c",
+        "jobs/swebench-opencode.yaml"
+    ],
+    "n_concurrent_trials": 4,
+    "retry": {
+        "max_retries": 0,
+        "exclude_exceptions": [
+            "RewardFileNotFoundError",
+            "AgentTimeoutError",
+            "VerifierOutputParseError",
+            "VerifierTimeoutError",
+            "RewardFileEmptyError"
+        ],
+        "wait_multiplier": 1.0,
+        "min_wait_sec": 1.0,
+        "max_wait_sec": 60.0
+    },
+    "trials": [
+        {
+            "task": {
+                "name": "swe-bench/astropy__astropy-12907",
+                "type": "package",
+                "digest": "sha256:ffa0f9b1e9f60875cb046c42c272b0edb869533362d026f1524a4ae216fbd336",
+                "source": "swe-bench/swe-bench-verified"
+            },
+            "timeout_multiplier": 1.0,
+            "agent": {
+                "name": "swe-dive-user-sim-acp/opencode",
+                "import_path": "swe_dive.harbor_agents.user_sim_agent:UserSimAcpAgent",
+                "skills": [],
+                "extra_allowed_hosts": [],
+                "kwargs": {
+                    "registry_spec": "acp:opencode",
+                    "persona": "BASE_MODE",
+                    "coding_mode": "COLLABORATIVE",
+                    "max_turns": 10,
+                    "sim_model": "gemini/gemini-3.6-flash",
+                    "validation_model": "gemini/gemini-2.5-flash-lite",
+                    "agent_model": "gemini/gemini-2.5-flash"
+                },
+                "env": {},
+                "mcp_servers": []
+            },
+            "skills": [],
+            "environment": {
+                "type": "docker",
+                "force_build": false,
+                "delete": true,
+                "cpu_enforcement_policy": "auto",
+                "memory_enforcement_policy": "auto",
+                "extra_docker_compose": [],
+                "env": {},
+                "kwargs": {},
+                "extra_allowed_hosts": []
+            },
+            "verifier": {
+                "env": {},
+                "disable": false
+            }
+        }
+    ]
+}

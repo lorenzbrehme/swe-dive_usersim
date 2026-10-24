@@ -1,0 +1,18 @@
+diff --git a/django/db/models/sql/where.py b/django/db/models/sql/where.py
+index e2af46a309..987fff0a4f 100644
+--- a/django/db/models/sql/where.py
++++ b/django/db/models/sql/where.py
+@@ -333,6 +333,13 @@ class SubqueryConstraint:
+         self.columns = columns
+         self.targets = targets
+         query_object.clear_ordering(clear_default=True)
++        # Ensure the subquery only selects the primary key to prevent
++        # "sub-select returns 10 columns - expected 1" errors when used with
++        # QuerySet.alias() after annotate().
++        query_object.clear_select_clause()
++        query_object.select = (
++            query_object.model._meta.pk.get_col(query_object.get_initial_alias()),
++        )
+         self.query_object = query_object
+ 
+     def as_sql(self, compiler, connection):

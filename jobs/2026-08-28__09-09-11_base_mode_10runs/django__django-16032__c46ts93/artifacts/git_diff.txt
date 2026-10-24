@@ -1,0 +1,29 @@
+diff --git a/django/db/models/lookups.py b/django/db/models/lookups.py
+index 866e38df83..b5bbb6d354 100644
+--- a/django/db/models/lookups.py
++++ b/django/db/models/lookups.py
+@@ -420,9 +420,8 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
+ 
+         if isinstance(self.rhs, Query):
+             self.rhs.clear_ordering(clear_default=True)
+-            if not self.rhs.has_select_fields:
+-                self.rhs.clear_select_clause()
+-                self.rhs.add_fields(["pk"])
++            self.rhs.clear_select_clause()
++            self.rhs.add_fields(["pk"])
+         return super().get_prep_lookup()
+ 
+     def process_rhs(self, compiler, connection):
+diff --git a/django/db/models/sql/compiler.py b/django/db/models/sql/compiler.py
+index 27310e5d9f..9a52714066 100644
+--- a/django/db/models/sql/compiler.py
++++ b/django/db/models/sql/compiler.py
+@@ -837,7 +837,7 @@ class SQLCompiler:
+             if for_update_part and not features.for_update_after_from:
+                 result.append(for_update_part)
+ 
+-            if self.query.subquery and extra_select:
++            if self.query.subquery:
+                 # If the query is used as a subquery, the extra selects would
+                 # result in more columns than the left-hand side expression is
+                 # expecting. This can happen when a subquery uses a combination

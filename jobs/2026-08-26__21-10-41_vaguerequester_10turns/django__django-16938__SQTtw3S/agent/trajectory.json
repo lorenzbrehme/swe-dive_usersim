@@ -1,0 +1,243 @@
+{
+  "schema_version": "ATIF-v1.7",
+  "session_id": "agent",
+  "agent": {
+    "name": "swe-dive-user-sim-acp/opencode",
+    "version": "1.18.23",
+    "model_name": "google/gemini-2.5-flash"
+  },
+  "steps": [
+    {
+      "step_id": 1,
+      "source": "user",
+      "message": "Serialization of m2m relations is throwing `FieldError: Field cannot be both deferred and traversed using select_related at the same time` when the target model uses a custom manager with select_related. Can you fix m2m serialization so it clears select_related or handles custom managers properly?"
+    },
+    {
+      "step_id": 2,
+      "source": "agent",
+      "message": "(no message)",
+      "tool_calls": [
+        {
+          "tool_call_id": "3h9UqQXzO29kexVv",
+          "function_name": "search",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "V7hU5h48bLdTJ0xn",
+          "function_name": "search",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "BLnqvhamNh3wXwAl",
+          "function_name": "search",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "VSrvZZkIhNpKjQGl",
+          "function_name": "search",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "Odef409fGFcMqrJ5",
+          "function_name": "file_read",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "UgfWyRWVaudskd9S",
+          "function_name": "file_read",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "jk7PyyfWfb7zQmVR",
+          "function_name": "file_read",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "qWAwfAIBkkbZxDPn",
+          "function_name": "file_edit",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "TWQLkSxnMg7AQoKN",
+          "function_name": "search",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "mv3hWPoCZFP8qlUI",
+          "function_name": "file_read",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "LLLpDfyj6C51IwiA",
+          "function_name": "search",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "VuNLI8hFkV0mmqGs",
+          "function_name": "search",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "dvcrbMjTSUwCwxPc",
+          "function_name": "file_read",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "HZeYCdXa2npG6zkz",
+          "function_name": "other",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "H7dfQl1ExU6q86sc",
+          "function_name": "file_edit",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "ucKz9HhlJ2c9qnYF",
+          "function_name": "file_edit",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "QVyACKoC6xuzo8Bq",
+          "function_name": "other",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "vFi2QyF6QiThFWAo",
+          "function_name": "file_edit",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "zIxuTH9mBq48ZCVg",
+          "function_name": "search",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "6VW0tNfE5LhoBwFS",
+          "function_name": "bash",
+          "arguments": {
+            "cwd": "/testbed"
+          }
+        },
+        {
+          "tool_call_id": "2hQOLoMG2YMdG25u",
+          "function_name": "search",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "WSCJAOI4EmHDXhXC",
+          "function_name": "bash",
+          "arguments": {
+            "cwd": "/testbed"
+          }
+        },
+        {
+          "tool_call_id": "N8OrxC1wiJQH7yIv",
+          "function_name": "file_read",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "g4XoHqZY7wxdfae6",
+          "function_name": "bash",
+          "arguments": {
+            "cwd": "/testbed"
+          }
+        },
+        {
+          "tool_call_id": "KC1Is7emUxfKJzqV",
+          "function_name": "bash",
+          "arguments": {
+            "cwd": "/testbed"
+          }
+        },
+        {
+          "tool_call_id": "xEMKNbSAEa79v34n",
+          "function_name": "bash",
+          "arguments": {
+            "cwd": "/testbed"
+          }
+        },
+        {
+          "tool_call_id": "gsdh2XA3uV91Wc1y",
+          "function_name": "file_read",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "ZVnDHCJppCH9EtBu",
+          "function_name": "file_edit",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "SwFUf0IKUzMT8KqV",
+          "function_name": "file_read",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "9dp4nZbjmQkv25lv",
+          "function_name": "file_read",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "dfG7E0ZpjXWXXbaA",
+          "function_name": "file_read",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "7GzCo36kYVyzqE1S",
+          "function_name": "file_edit",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "XsDFc5ZxfUI7OnlH",
+          "function_name": "file_edit",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "Rz7gvqlEnT4VNvXl",
+          "function_name": "bash",
+          "arguments": {
+            "cwd": "/testbed"
+          }
+        },
+        {
+          "tool_call_id": "uzyAfSqaQgMOybA7",
+          "function_name": "other",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "3W7nwbIN6oUa2XoD",
+          "function_name": "file_read",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "SdCuywoVq5fIzk9q",
+          "function_name": "file_edit",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "p20FVcNnsLhH0w4r",
+          "function_name": "file_edit",
+          "arguments": {}
+        }
+      ],
+      "observation": {
+        "results": [
+          {
+            "content": "diff --git a/django/core/serializers/python.py b/django/core/serializers/python.py\nindex 36048601af..d5358427fd 100644\n--- a/django/core/serializers/python.py\n+++ b/django/core/serializers/python.py\n@@ -79,7 +79,7 @@ class Serializer(base.Serializer):\n                     return self._value_from_field(value, value._meta.pk)\n \n                 def queryset_iterator(obj, field):\n-                    return getattr(obj, field.name).only(\"pk\").iterator()\n+                    return getattr(obj, field.name).all().select_related(None).only(\"pk\").iterator()\n \n             m2m_iter = getattr(obj, \"_prefetched_objects_cache\", {}).get(\n                 field.name,\ndiff --git a/django/core/serializers/xml_serializer.py b/django/core/serializers/xml_serializer.py\nindex 1d3269c41a..25f67942ac 100644\n--- a/django/core/serializers/xml_serializer.py\n+++ b/django/core/serializers/xml_serializer.py\n@@ -155,7 +155,7 @@ class Serializer(base.Serializer):\n                     self.xml.addQuickElement(\"object\", attrs={\"pk\": str(value.pk)})\n \n                 def queryset_iterator(obj, field):\n-                    return getattr(obj, field.name).only(\"pk\").iterator()\n+                    return getattr(obj, field.name).all().select_related(None).only(\"pk\").iterator()\n \n             m2m_iter = getattr(obj, \"_prefetched_objects_cache\", {}).get(\n                 field.name,\ndiff --git a/tests/serializers/models/base.py b/tests/serializers/models/base.py\nindex af9ca2b20a..e4f77a82eb 100644\n--- a/tests/serializers/models/base.py\n+++ b/tests/serializers/models/base.py\n@@ -9,7 +9,13 @@ from decimal import Decimal\n from django.db import models\n \n \n+class MetaDataDetail(models.Model):\n+    name = models.CharField(max_length=10)\n+\n class CategoryMetaDataManager(models.Manager):\n+    def get_queryset(self):\n+        return super().get_queryset().select_related('detail')\n+\n     def get_by_natural_key(self, kind, name):\n         return self.get(kind=kind, name=name)\n \n@@ -18,6 +24,7 @@ class CategoryMetaData(models.Model):\n     kind = models.CharField(max_length=10)\n     name = models.CharField(max_length=10)\n     value = models.CharField(max_length=10)\n+    detail = models.ForeignKey(MetaDataDetail, models.CASCADE, null=True, default=None)\n     objects = CategoryMetaDataManager()\n \n     class Meta:\ndiff --git a/tests/serializers/tests.py b/tests/serializers/tests.py\nindex 67ae8f43de..3460431be5 100644\n--- a/tests/serializers/tests.py\n+++ b/tests/serializers/tests.py\n@@ -6,6 +6,7 @@ from unittest import mock, skipIf\n from django.core import serializers\n from django.core.serializers import SerializerDoesNotExist\n from django.core.serializers.base import ProgressBar\n+from django.core.exceptions import FieldError\n from django.db import connection, transaction\n from django.http import HttpResponse\n from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature\n@@ -317,6 +318,26 @@ class SerializersTestBase:\n         deserial_objs = list(serializers.deserialize(self.serializer_name, serial_str))\n         self.assertIsInstance(deserial_objs[0].object, Author)\n \n+    def test_m2m_serialization_with_custom_manager_select_related(self):\n+        # This test ensures that m2m serialization works correctly when the\n+        # target model uses a custom manager with select_related, and does\n+        # not raise FieldError due to deferred fields conflicting with\n+        # select_related.\n+        from datetime import datetime\n+        from serializers.models.base import Article, CategoryMetaData, Author, MetaDataDetail\n+\n+        detail = MetaDataDetail.objects.create(name=\"detail1\")\n+        meta_data_1 = CategoryMetaData.objects.create(kind=\"k1\", name=\"n1\", value=\"v1\", detail=detail)\n+        meta_data_2 = CategoryMetaData.objects.create(kind=\"k2\", name=\"n2\", value=\"v2\", detail=detail)\n+        author = Author.objects.create(name=\"John Doe\")\n+        article = Article.objects.create(author=author, headline=\"Article 1\", pub_date=datetime.now())\n+        article.meta_data.add(meta_data_1, meta_data_2)\n+\n+        try:\n+            serializers.serialize(self.serializer_name, Article.objects.all())\n+        except FieldError as e:\n+            self.fail(f\"Serialization raised FieldError: {e}\")\n+\n     def test_custom_field_serialization(self):\n         \"\"\"Custom fields serialize and deserialize intact\"\"\"\n         team_str = \"Spartak Moskva\"\n"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 3,
+      "source": "user",
+      "message": "```json\n{\n    \"follow-up\": \"[DONE]\"\n}\n```"
+    }
+  ],
+  "final_metrics": {
+    "total_prompt_tokens": 5700,
+    "total_completion_tokens": 1995,
+    "total_cost_usd": 0.01175625,
+    "total_steps": 3
+  }
+}

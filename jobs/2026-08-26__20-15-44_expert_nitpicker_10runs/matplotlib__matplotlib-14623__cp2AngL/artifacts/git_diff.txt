@@ -1,0 +1,36 @@
+diff --git a/lib/matplotlib/scale.py b/lib/matplotlib/scale.py
+index b482a664b..94c599752 100644
+--- a/lib/matplotlib/scale.py
++++ b/lib/matplotlib/scale.py
+@@ -154,6 +154,9 @@ class FuncScale(ScaleBase):
+ 
+     name = 'function'
+ 
++    def limit_range_for_scale(self, vmin, vmax, minpos):
++        return (vmax, vmin) if vmin > vmax else (vmin, vmax)
++
+     def __init__(self, axis, functions):
+         """
+         Parameters
+@@ -425,8 +428,9 @@ class LogScale(ScaleBase):
+             minpos = 1e-300  # This value should rarely if ever
+                              # end up with a visible effect.
+ 
+-        return (minpos if vmin <= 0 else vmin,
+-                minpos if vmax <= 0 else vmax)
++        return ((minpos if vmax <= 0 else vmax), (minpos if vmin <= 0 else vmin)) \
++            if vmin > vmax else \
++            ((minpos if vmin <= 0 else vmin), (minpos if vmax <= 0 else vmax))
+ 
+ 
+ class FuncScaleLog(LogScale):
+@@ -531,6 +535,9 @@ class InvertedSymmetricalLogTransform(Transform):
+ 
+ 
+ class SymmetricalLogScale(ScaleBase):
++    def limit_range_for_scale(self, vmin, vmax, minpos):
++        return (vmax, vmin) if vmin > vmax else (vmin, vmax)
++
+     """
+     The symmetrical logarithmic scale is logarithmic in both the
+     positive and negative directions from the origin.

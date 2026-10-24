@@ -1,0 +1,67 @@
+{
+    "task": {
+        "path": null,
+        "git_url": null,
+        "git_commit_id": null,
+        "name": "swe-bench/matplotlib__matplotlib-14623",
+        "ref": "sha256:97fcd85294cffa89e2a411a4860c2e540c76402b82812d2771c04c4967fafb0d",
+        "overwrite": false,
+        "download_dir": null,
+        "source": "swe-bench/swe-bench-verified"
+    },
+    "trial_name": "matplotlib__matplotlib-14623__5JSW9gX",
+    "trials_dir": "jobs/2026-08-28__09-09-11",
+    "timeout_multiplier": 1.0,
+    "agent_timeout_multiplier": null,
+    "verifier_timeout_multiplier": null,
+    "agent_setup_timeout_multiplier": null,
+    "environment_build_timeout_multiplier": null,
+    "agent": {
+        "name": "swe-dive-user-sim-acp/opencode",
+        "import_path": "swe_dive.harbor_agents.user_sim_agent:UserSimAcpAgent",
+        "model_name": null,
+        "skills": [],
+        "override_timeout_sec": null,
+        "override_setup_timeout_sec": null,
+        "max_timeout_sec": null,
+        "extra_allowed_hosts": [],
+        "kwargs": {
+            "registry_spec": "acp:opencode",
+            "persona": "BASE_MODE",
+            "coding_mode": "COLLABORATIVE",
+            "max_turns": 10,
+            "sim_model": "gemini/gemini-3.6-flash",
+            "validation_model": "gemini/gemini-2.5-flash-lite",
+            "agent_model": "gemini/gemini-2.5-flash"
+        },
+        "env": {},
+        "mcp_servers": []
+    },
+    "environment": {
+        "type": "docker",
+        "import_path": null,
+        "force_build": false,
+        "delete": true,
+        "cpu_enforcement_policy": "auto",
+        "memory_enforcement_policy": "auto",
+        "override_cpus": null,
+        "override_memory_mb": null,
+        "override_storage_mb": null,
+        "override_gpus": null,
+        "override_tpu": null,
+        "mounts": null,
+        "extra_docker_compose": [],
+        "env": {},
+        "kwargs": {},
+        "extra_allowed_hosts": []
+    },
+    "verifier": {
+        "override_timeout_sec": null,
+        "max_timeout_sec": null,
+        "env": {},
+        "disable": false
+    },
+    "artifacts": [],
+    "extra_instruction_paths": [],
+    "job_id": "ea2a623b-827a-43db-8b87-cec7baf997e5"
+}

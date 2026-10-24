@@ -1,0 +1,52 @@
+diff --git a/django/db/models/sql/compiler.py b/django/db/models/sql/compiler.py
+index a791908caf..d532576e8d 100644
+--- a/django/db/models/sql/compiler.py
++++ b/django/db/models/sql/compiler.py
+@@ -343,18 +343,35 @@ class SQLCompiler:
+         for expr, is_ref in order_by:
+             resolved = expr.resolve_expression(self.query, allow_joins=True, reuse=None)
+             if self.query.combinator:
+-                src = resolved.get_source_expressions()[0]
+-                # Relabel order by columns to raw numbers if this is a combined
+-                # query; necessary since the columns can't be referenced by the
+-                # fully qualified name and the simple column names may collide.
+-                for idx, (sel_expr, _, col_alias) in enumerate(self.select):
+-                    if is_ref and col_alias == src.refs:
+-                        src = src.source
+-                    elif col_alias:
+-                        continue
+-                    if src == sel_expr:
+-                        resolved.set_source_expressions([RawSQL('%d' % (idx + 1), ())])
+-                        break
++                order_by_target = resolved.get_source_expressions()[0]
++                matched_idx = None
++
++                # First, try to match by alias if order_by_target is a Ref.
++                if isinstance(order_by_target, Ref):
++                    for idx, (select_expr, (select_sql, select_params), select_alias) in enumerate(self.select):
++                        if order_by_target.refs == select_alias:
++                            matched_idx = idx + 1
++                            break
++                
++                # If not matched by alias, or not a Ref, proceed to compile and compare.
++                if matched_idx is None:
++                    # Compile the order_by target to SQL for comparison.
++                    # Do not force select_format; get the raw SQL representation.
++                    order_by_sql, order_by_params = self.compile(order_by_target)
++
++                    for idx, (select_expr, (select_sql, select_params), select_alias) in enumerate(self.select):
++                        # Direct object comparison as a primary check.
++                        if order_by_target == select_expr:
++                            matched_idx = idx + 1
++                            break
++                        # Fallback to SQL comparison for robustness if object comparison fails.
++                        if order_by_sql == select_sql and order_by_params == select_params:
++                            matched_idx = idx + 1
++                            break
++                
++                if matched_idx is not None:
++                    # Replace the OrderBy expression's source with a RawSQL of the position.
++                    resolved.set_source_expressions([RawSQL('%d' % matched_idx, ())])
+                 else:
+                     raise DatabaseError('ORDER BY term does not match any column in the result set.')
+             sql, params = self.compile(resolved)

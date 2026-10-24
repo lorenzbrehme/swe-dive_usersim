@@ -1,0 +1,27 @@
+diff --git a/django/db/models/lookups.py b/django/db/models/lookups.py
+index 866e38df83..1228d55add 100644
+--- a/django/db/models/lookups.py
++++ b/django/db/models/lookups.py
+@@ -419,10 +419,22 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
+         from django.db.models.sql.query import Query  # avoid circular import
+ 
+         if isinstance(self.rhs, Query):
++            # If the query is already "multi-valued" then the columns will be
++            # properly set and we don't need to do anything.
++            if self.rhs._has_limited_fields:
++                return super().get_prep_lookup()
+             self.rhs.clear_ordering(clear_default=True)
++            # If the QuerySet is not limited to a single field, select the
++            # primary key.
+             if not self.rhs.has_select_fields:
+                 self.rhs.clear_select_clause()
+                 self.rhs.add_fields(["pk"])
++            # If the QuerySet has select_fields, ensure it's limited to 1.
++            # This is important for .annotate().alias() cases.
++            elif len(self.rhs.target_fields) > 1:
++                # Clear all select fields including any from annotations.
++                self.rhs.clear_select_clause(clear_default=True)
++                self.rhs.add_fields(["pk"])
+         return super().get_prep_lookup()
+ 
+     def process_rhs(self, compiler, connection):

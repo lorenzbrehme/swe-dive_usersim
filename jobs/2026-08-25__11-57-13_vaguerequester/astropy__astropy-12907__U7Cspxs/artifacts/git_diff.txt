@@ -1,0 +1,301 @@
+diff --git a/astropy/modeling/separable.py b/astropy/modeling/separable.py
+index a308e2729..292375d6b 100755
+--- a/astropy/modeling/separable.py
++++ b/astropy/modeling/separable.py
+@@ -54,13 +54,9 @@ def is_separable(transform):
+         array([ True,  True,  True,  True]...)
+ 
+     """
+-    if transform.n_inputs == 1 and transform.n_outputs > 1:
+-        is_separable = np.array([False] * transform.n_outputs).T
+-        return is_separable
+-    separable_matrix = _separable(transform)
+-    is_separable = separable_matrix.sum(1)
+-    is_separable = np.where(is_separable != 1, False, True)
+-    return is_separable
++    separable_matrix_raw = _separable(transform)
++    is_separable_vec = separable_matrix_raw.sum(axis=1)
++    return np.where(is_separable_vec == 1, True, False)
+ 
+ 
+ def separability_matrix(transform):
+@@ -94,213 +90,88 @@ def separability_matrix(transform):
+         array([[ True, False], [False,  True], [ True, False], [False,  True]]...)
+ 
+     """
+-    if transform.n_inputs == 1 and transform.n_outputs > 1:
+-        return np.ones((transform.n_outputs, transform.n_inputs),
+-                       dtype=np.bool_)
+-    separable_matrix = _separable(transform)
+-    separable_matrix = np.where(separable_matrix != 0, True, False)
+-    return separable_matrix
++    separable_matrix_raw = _separable(transform)
++    return np.where(separable_matrix_raw != 0, True, False)
+ 
+ 
+-def _compute_n_outputs(left, right):
+-    """
+-    Compute the number of outputs of two models.
+ 
+-    The two models are the left and right model to an operation in
+-    the expression tree of a compound model.
+ 
+-    Parameters
+-    ----------
+-    left, right : `astropy.modeling.Model` or ndarray
+-        If input is of an array, it is the output of `coord_matrix`.
+ 
+-    """
+-    if isinstance(left, Model):
+-        lnout = left.n_outputs
+-    else:
+-        lnout = left.shape[0]
+-    if isinstance(right, Model):
+-        rnout = right.n_outputs
+-    else:
+-        rnout = right.shape[0]
+-    noutp = lnout + rnout
+-    return noutp
+-
+-
+-def _arith_oper(left, right):
++def _arith_oper(left_sep_matrix, right_sep_matrix):
+     """
+     Function corresponding to one of the arithmetic operators
+-    ['+', '-'. '*', '/', '**'].
+-
+-    This always returns a nonseparable output.
+-
+-
+-    Parameters
+-    ----------
+-    left, right : `astropy.modeling.Model` or ndarray
+-        If input is of an array, it is the output of `coord_matrix`.
+-
+-    Returns
+-    -------
+-    result : ndarray
+-        Result from this operation.
++    ['+', '-', '*', '/', '**'].
++    This always returns a nonseparable output, where all outputs depend on all inputs.
+     """
+-    # models have the same number of inputs and outputs
+-    def _n_inputs_outputs(input):
+-        if isinstance(input, Model):
+-            n_outputs, n_inputs = input.n_outputs, input.n_inputs
+-        else:
+-            n_outputs, n_inputs = input.shape
+-        return n_inputs, n_outputs
+-
+-    left_inputs, left_outputs = _n_inputs_outputs(left)
+-    right_inputs, right_outputs = _n_inputs_outputs(right)
+-
+-    if left_inputs != right_inputs or left_outputs != right_outputs:
++    if left_sep_matrix.shape != right_sep_matrix.shape:
+         raise ModelDefinitionError(
+-            "Unsupported operands for arithmetic operator: left (n_inputs={}, "
+-            "n_outputs={}) and right (n_inputs={}, n_outputs={}); "
+-            "models must have the same n_inputs and the same "
+-            "n_outputs for this operator.".format(
+-                left_inputs, left_outputs, right_inputs, right_outputs))
++            f"Unsupported operands for arithmetic operator: left matrix shape "
++            f"{left_sep_matrix.shape} and right matrix shape {right_sep_matrix.shape}; "
++            f"matrices must have the same shape for this operator."
++        )
+ 
+-    result = np.ones((left_outputs, left_inputs))
+-    return result
++    return np.ones(left_sep_matrix.shape, dtype=np.int8)
+ 
+ 
+-def _coord_matrix(model, pos, noutp):
++def _coord_matrix(model):
+     """
+     Create an array representing inputs and outputs of a simple model.
+-
+-    The array has a shape (noutp, model.n_inputs).
+-
+-    Parameters
+-    ----------
+-    model : `astropy.modeling.Model`
+-        model
+-    pos : str
+-        Position of this model in the expression tree.
+-        One of ['left', 'right'].
+-    noutp : int
+-        Number of outputs of the compound model of which the input model
+-        is a left or right child.
+-
++    The array has a shape (model.n_outputs, model.n_inputs).
++    This function *only* calculates the intrinsic separability matrix
++    for a simple model, without considering its position in a compound model.
+     """
+     if isinstance(model, Mapping):
+         axes = []
+         for i in model.mapping:
+-            axis = np.zeros((model.n_inputs,))
++            axis = np.zeros((model.n_inputs,), dtype=np.int8)
+             axis[i] = 1
+             axes.append(axis)
+-        m = np.vstack(axes)
+-        mat = np.zeros((noutp, model.n_inputs))
+-        if pos == 'left':
+-            mat[: model.n_outputs, :model.n_inputs] = m
+-        else:
+-            mat[-model.n_outputs:, -model.n_inputs:] = m
+-        return mat
+-    if not model.separable:
+-        # this does not work for more than 2 coordinates
+-        mat = np.zeros((noutp, model.n_inputs))
+-        if pos == 'left':
+-            mat[:model.n_outputs, : model.n_inputs] = 1
+-        else:
+-            mat[-model.n_outputs:, -model.n_inputs:] = 1
++        return np.vstack(axes)
++    elif not model.separable:
++        return np.ones((model.n_outputs, model.n_inputs), dtype=np.int8)
+     else:
+-        mat = np.zeros((noutp, model.n_inputs))
++        rows = model.n_outputs
++        cols = model.n_inputs
++        matrix = np.zeros((rows, cols), dtype=np.int8)
++        for i in range(min(rows, cols)):
++            matrix[i, i] = 1
++        return matrix
+ 
+-        for i in range(model.n_inputs):
+-            mat[i, i] = 1
+-        if pos == 'right':
+-            mat = np.roll(mat, (noutp - model.n_outputs))
+-    return mat
+ 
+-
+-def _cstack(left, right):
++def _cstack(left_sep_matrix, right_sep_matrix):
+     """
+-    Function corresponding to '&' operation.
+-
+-    Parameters
+-    ----------
+-    left, right : `astropy.modeling.Model` or ndarray
+-        If input is of an array, it is the output of `coord_matrix`.
+-
+-    Returns
+-    -------
+-    result : ndarray
+-        Result from this operation.
+-
++    Function corresponding to '&' operation (concatenation).
++    Combines two separability matrices by placing them in blocks.
+     """
+-    noutp = _compute_n_outputs(left, right)
+-
+-    if isinstance(left, Model):
+-        cleft = _coord_matrix(left, 'left', noutp)
+-    else:
+-        cleft = np.zeros((noutp, left.shape[1]))
+-        cleft[: left.shape[0], : left.shape[1]] = left
+-    if isinstance(right, Model):
+-        cright = _coord_matrix(right, 'right', noutp)
+-    else:
+-        cright = np.zeros((noutp, right.shape[1]))
+-        cright[-right.shape[0]:, -right.shape[1]:] = 1
++    total_outputs = left_sep_matrix.shape[0] + right_sep_matrix.shape[0]
++    total_inputs = left_sep_matrix.shape[1] + right_sep_matrix.shape[1]
+ 
+-    return np.hstack([cleft, cright])
++    result_matrix = np.zeros((total_outputs, total_inputs), dtype=np.int8)
+ 
++    result_matrix[:left_sep_matrix.shape[0], :left_sep_matrix.shape[1]] = left_sep_matrix
++    result_matrix[left_sep_matrix.shape[0]:, left_sep_matrix.shape[1]:] = right_sep_matrix
+ 
+-def _cdot(left, right):
+-    """
+-    Function corresponding to "|" operation.
++    return result_matrix
+ 
+-    Parameters
+-    ----------
+-    left, right : `astropy.modeling.Model` or ndarray
+-        If input is of an array, it is the output of `coord_matrix`.
+ 
+-    Returns
+-    -------
+-    result : ndarray
+-        Result from this operation.
++def _cdot(left_sep_matrix, right_sep_matrix):
++    """
++    Function corresponding to '|' operation (composition).
++    Multiplies two separability matrices.
+     """
+-
+-    left, right = right, left
+-
+-    def _n_inputs_outputs(input, position):
+-        """
+-        Return ``n_inputs``, ``n_outputs`` for a model or coord_matrix.
+-        """
+-        if isinstance(input, Model):
+-            coords = _coord_matrix(input, position, input.n_outputs)
+-        else:
+-            coords = input
+-        return coords
+-
+-    cleft = _n_inputs_outputs(left, 'left')
+-    cright = _n_inputs_outputs(right, 'right')
+-
+     try:
+-        result = np.dot(cleft, cright)
++        result = np.dot(left_sep_matrix, right_sep_matrix)
+     except ValueError:
+         raise ModelDefinitionError(
+-            'Models cannot be combined with the "|" operator; '
+-            'left coord_matrix is {}, right coord_matrix is {}'.format(
+-                cright, cleft))
++            f'Models cannot be combined with the "|" operator; '
++            f'left matrix shape is {left_sep_matrix.shape}, '
++            f'right matrix shape is {right_sep_matrix.shape}. '
++            f'Number of columns of left matrix must match number of rows of right matrix for composition.'
++        )
+     return result
+ 
+ 
+ def _separable(transform):
+-    """
+-    Calculate the separability of outputs.
+-
+-    Parameters
+-    ----------
+-    transform : `astropy.modeling.Model`
+-        A transform (usually a compound model).
+-
+-    Returns :
+-    is_separable : ndarray of dtype np.bool
+-        An array of shape (transform.n_outputs,) of boolean type
+-        Each element represents the separablity of the corresponding output.
+-    """
+     if (transform_matrix := transform._calculate_separability_matrix()) is not NotImplemented:
+         return transform_matrix
+     elif isinstance(transform, CompoundModel):
+@@ -308,7 +179,7 @@ def _separable(transform):
+         sepright = _separable(transform.right)
+         return _operators[transform.op](sepleft, sepright)
+     elif isinstance(transform, Model):
+-        return _coord_matrix(transform, 'left', transform.n_outputs)
++        return _coord_matrix(transform)
+ 
+ 
+ # Maps modeling operators to a function computing and represents the
+diff --git a/tox.ini b/tox.ini
+index ae4e42a0e..0706e3fd9 100755
+--- a/tox.ini
++++ b/tox.ini
+@@ -19,7 +19,7 @@ isolated_build = true
+ pypi_filter = https://raw.githubusercontent.com/astropy/ci-helpers/main/pip_pinnings.txt
+ 
+ # Pass through the following environment variables which are needed for the CI
+-passenv = HOME WINDIR LC_ALL LC_CTYPE CC CI IS_CRON ARCH_ON_CI TEST_READ_HUGE_FILE
++passenv = HOME,WINDIR,LC_ALL,LC_CTYPE,CC,CI,IS_CRON,ARCH_ON_CI,TEST_READ_HUGE_FILE
+ 
+ # For coverage, we need to pass extra options to the C compiler
+ setenv =

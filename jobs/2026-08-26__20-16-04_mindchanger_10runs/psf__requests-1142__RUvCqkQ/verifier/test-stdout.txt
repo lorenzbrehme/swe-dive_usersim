@@ -1,0 +1,626 @@
++ cd /testbed
++ set +x
++ python -m pip install .
+Processing /testbed
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Building wheels for collected packages: requests
+  Building wheel for requests (setup.py): started
+  Building wheel for requests (setup.py): finished with status 'done'
+  Created wheel for requests: filename=requests-1.1.0-py3-none-any.whl size=362745 sha256=3cdfdf565ad2eff5a6859add84fa7a7e38c0557960248667e8ce64b97401c8fb
+  Stored in directory: /tmp/pip-ephem-wheel-cache-iyghyh1i/wheels/7d/66/67/70d1ee2124ccf21d601c352e25cdca10f611f7c8b3f9ffb9e4
+Successfully built requests
+Installing collected packages: requests
+  Attempting uninstall: requests
+    Found existing installation: requests 1.1.0
+    Uninstalling requests-1.1.0:
+      Successfully uninstalled requests-1.1.0
+Successfully installed requests-1.1.0
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
++ git checkout 22623bd8c265b78b161542663ee980738441c307 test_requests.py
+Updated 1 path from 3b8ba30
++ for path in test_requests.py
++ '[' -e test_requests.py ']'
++ git ls-files --error-unmatch -- test_requests.py
++ echo 'diff --git a/test_requests.py b/test_requests.py
+--- a/test_requests.py
++++ b/test_requests.py
+@@ -58,6 +58,13 @@ def test_basic_building(self):
+         assert pr.body == '\''life=42'\''
+
+
++    def test_no_content_length(self):
++        get_req = requests.Request('\''GET'\'', httpbin('\''get'\'')).prepare()
++        self.assertTrue('\''Content-Length'\'' not in get_req.headers)
++        head_req = requests.Request('\''HEAD'\'', httpbin('\''head'\'')).prepare()
++        self.assertTrue('\''Content-Length'\'' not in head_req.headers)
++
++
+     def test_path_is_not_double_encoded(self):
+         request = requests.Request('\''GET'\'', "http://0.0.0.0/get/test case").prepare()
+
+'
++ git apply --check /tmp/test_patch.diff
++ git apply /tmp/test_patch.diff
+++ mktemp
++ LOG_FILE=/tmp/tmp.nUpk0wProJ
++ export LOG_FILE
++ exec
++ exec
+++ tee /tmp/tmp.nUpk0wProJ
++ set +x
+============================= test session starts ==============================
+platform linux -- Python 3.9.20, pytest-7.4.4, pluggy-1.0.0
+rootdir: /testbed
+collected 27 items
+
+test_requests.py .FF..............F.........                             [100%]
+
+=================================== FAILURES ===================================
+_____________ RequestsTestCase.test_DIGESTAUTH_WRONG_HTTP_401_GET ______________
+
+self = <test_requests.RequestsTestCase testMethod=test_DIGESTAUTH_WRONG_HTTP_401_GET>
+
+    def test_DIGESTAUTH_WRONG_HTTP_401_GET(self):
+    
+        auth = HTTPDigestAuth('user', 'wrongpass')
+        url = httpbin('digest-auth', 'auth', 'user', 'pass')
+    
+>       r = requests.get(url, auth=auth)
+
+test_requests.py:175: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/api.py:55: in get
+    return request('get', url, **kwargs)
+requests/api.py:44: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:280: in request
+    resp = self.send(prep, stream=stream, timeout=timeout, verify=verify, cert=cert, proxies=proxies)
+requests/sessions.py:373: in send
+    r = adapter.send(request, **kwargs)
+requests/adapters.py:216: in send
+    r = self.build_response(request, resp)
+requests/adapters.py:105: in build_response
+    extract_cookies_to_jar(response.cookies, req, resp)
+requests/cookies.py:105: in extract_cookies_to_jar
+    jar.extract_cookies(res, req)
+/opt/miniconda3/envs/testbed/lib/python3.9/http/cookiejar.py:1683: in extract_cookies
+    if self._policy.set_ok(cookie, request):
+/opt/miniconda3/envs/testbed/lib/python3.9/http/cookiejar.py:956: in set_ok
+    if not fn(cookie, request):
+/opt/miniconda3/envs/testbed/lib/python3.9/http/cookiejar.py:977: in set_ok_verifiability
+    if request.unverifiable and is_third_party(request):
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+request = <requests.cookies.MockRequest object at 0x7c254de72520>
+
+    def is_third_party(request):
+        """
+    
+        RFC 2965, section 3.3.6:
+    
+            An unverifiable transaction is to a third-party host if its request-
+            host U does not domain-match the reach R of the request-host O in the
+            origin transaction.
+    
+        """
+        req_host = request_host(request)
+>       if not domain_match(req_host, reach(request.origin_req_host)):
+E       AttributeError: 'MockRequest' object has no attribute 'origin_req_host'
+
+/opt/miniconda3/envs/testbed/lib/python3.9/http/cookiejar.py:730: AttributeError
+_________________ RequestsTestCase.test_DIGEST_HTTP_200_OK_GET _________________
+
+self = <test_requests.RequestsTestCase testMethod=test_DIGEST_HTTP_200_OK_GET>
+
+    def test_DIGEST_HTTP_200_OK_GET(self):
+    
+        auth = HTTPDigestAuth('user', 'pass')
+        url = httpbin('digest-auth', 'auth', 'user', 'pass')
+    
+>       r = requests.get(url, auth=auth)
+
+test_requests.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/api.py:55: in get
+    return request('get', url, **kwargs)
+requests/api.py:44: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:280: in request
+    resp = self.send(prep, stream=stream, timeout=timeout, verify=verify, cert=cert, proxies=proxies)
+requests/sessions.py:373: in send
+    r = adapter.send(request, **kwargs)
+requests/adapters.py:216: in send
+    r = self.build_response(request, resp)
+requests/adapters.py:105: in build_response
+    extract_cookies_to_jar(response.cookies, req, resp)
+requests/cookies.py:105: in extract_cookies_to_jar
+    jar.extract_cookies(res, req)
+/opt/miniconda3/envs/testbed/lib/python3.9/http/cookiejar.py:1683: in extract_cookies
+    if self._policy.set_ok(cookie, request):
+/opt/miniconda3/envs/testbed/lib/python3.9/http/cookiejar.py:956: in set_ok
+    if not fn(cookie, request):
+/opt/miniconda3/envs/testbed/lib/python3.9/http/cookiejar.py:977: in set_ok_verifiability
+    if request.unverifiable and is_third_party(request):
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+request = <requests.cookies.MockRequest object at 0x7c254dd82160>
+
+    def is_third_party(request):
+        """
+    
+        RFC 2965, section 3.3.6:
+    
+            An unverifiable transaction is to a third-party host if its request-
+            host U does not domain-match the reach R of the request-host O in the
+            origin transaction.
+    
+        """
+        req_host = request_host(request)
+>       if not domain_match(req_host, reach(request.origin_req_host)):
+E       AttributeError: 'MockRequest' object has no attribute 'origin_req_host'
+
+/opt/miniconda3/envs/testbed/lib/python3.9/http/cookiejar.py:730: AttributeError
+_________________________ RequestsTestCase.test_links __________________________
+
+self = <requests.packages.urllib3.connectionpool.HTTPSConnectionPool object at 0x7c254dc400a0>
+method = 'HEAD', url = '/users/kennethreitz/repos?page=1&per_page=10'
+body = None
+headers = {'User-Agent': 'python-requests/1.1.0 CPython/3.9.20 Linux/6.18.33.2-microsoft-standard-WSL2', 'Accept-Encoding': 'gzip, deflate, compress', 'Accept': '*/*'}
+retries = 0, redirect = False, assert_same_host = False, timeout = None
+pool_timeout = None, release_conn = False
+response_kw = {'decode_content': False, 'preload_content': False}
+conn = <requests.packages.urllib3.connectionpool.VerifiedHTTPSConnection object at 0x7c254dc40ee0>
+
+    def urlopen(self, method, url, body=None, headers=None, retries=3,
+                redirect=True, assert_same_host=True, timeout=_Default,
+                pool_timeout=None, release_conn=None, **response_kw):
+        """
+        Get a connection from the pool and perform an HTTP request. This is the
+        lowest level call for making a request, so you'll need to specify all
+        the raw details.
+    
+        .. note::
+    
+           More commonly, it's appropriate to use a convenience method provided
+           by :class:`.RequestMethods`, such as :meth:`request`.
+    
+        .. note::
+    
+           `release_conn` will only behave as expected if
+           `preload_content=False` because we want to make
+           `preload_content=False` the default behaviour someday soon without
+           breaking backwards compatibility.
+    
+        :param method:
+            HTTP request method (such as GET, POST, PUT, etc.)
+    
+        :param body:
+            Data to send in the request body (useful for creating
+            POST requests, see HTTPConnectionPool.post_url for
+            more convenience).
+    
+        :param headers:
+            Dictionary of custom headers to send, such as User-Agent,
+            If-None-Match, etc. If None, pool headers are used. If provided,
+            these headers completely replace any pool-specific headers.
+    
+        :param retries:
+            Number of retries to allow before raising a MaxRetryError exception.
+    
+        :param redirect:
+            If True, automatically handle redirects (status codes 301, 302,
+            303, 307). Each redirect counts as a retry.
+    
+        :param assert_same_host:
+            If ``True``, will make sure that the host of the pool requests is
+            consistent else will raise HostChangedError. When False, you can
+            use the pool on an HTTP proxy and request foreign hosts.
+    
+        :param timeout:
+            If specified, overrides the default timeout for this one request.
+    
+        :param pool_timeout:
+            If set and the pool is set to block=True, then this method will
+            block for ``pool_timeout`` seconds and raise EmptyPoolError if no
+            connection is available within the time period.
+    
+        :param release_conn:
+            If False, then the urlopen call will not release the connection
+            back into the pool once a response is received (but will release if
+            you read the entire contents of the response such as when
+            `preload_content=True`). This is useful if you're not preloading
+            the response's content immediately. You will need to call
+            ``r.release_conn()`` on the response ``r`` to return the connection
+            back into the pool. If None, it takes the value of
+            ``response_kw.get('preload_content', True)``.
+    
+        :param \**response_kw:
+            Additional parameters are passed to
+            :meth:`urllib3.response.HTTPResponse.from_httplib`
+        """
+        if headers is None:
+            headers = self.headers
+    
+        if retries < 0:
+            raise MaxRetryError(self, url)
+    
+        if timeout is _Default:
+            timeout = self.timeout
+    
+        if release_conn is None:
+            release_conn = response_kw.get('preload_content', True)
+    
+        # Check host
+        if assert_same_host and not self.is_same_host(url):
+            host = "%s://%s" % (self.scheme, self.host)
+            if self.port:
+                host = "%s:%d" % (host, self.port)
+    
+            raise HostChangedError(self, url, retries - 1)
+    
+        conn = None
+    
+        try:
+            # Request a connection from the queue
+            conn = self._get_conn(timeout=pool_timeout)
+    
+            # Make the request on the httplib connection object
+>           httplib_response = self._make_request(conn, method, url,
+                                                  timeout=timeout,
+                                                  body=body, headers=headers)
+
+requests/packages/urllib3/connectionpool.py:418: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/packages/urllib3/connectionpool.py:272: in _make_request
+    conn.request(method, url, **httplib_request_kw)
+/opt/miniconda3/envs/testbed/lib/python3.9/http/client.py:1285: in request
+    self._send_request(method, url, body, headers, encode_chunked)
+/opt/miniconda3/envs/testbed/lib/python3.9/http/client.py:1331: in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+/opt/miniconda3/envs/testbed/lib/python3.9/http/client.py:1280: in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+/opt/miniconda3/envs/testbed/lib/python3.9/http/client.py:1040: in _send_output
+    self.send(msg)
+/opt/miniconda3/envs/testbed/lib/python3.9/http/client.py:980: in send
+    self.connect()
+requests/packages/urllib3/connectionpool.py:100: in connect
+    self.sock = ssl_wrap_socket(sock, self.key_file, self.cert_file,
+requests/packages/urllib3/util.py:329: in ssl_wrap_socket
+    return context.wrap_socket(sock, server_hostname=server_hostname)
+/opt/miniconda3/envs/testbed/lib/python3.9/ssl.py:501: in wrap_socket
+    return self.sslsocket_class._create(
+/opt/miniconda3/envs/testbed/lib/python3.9/ssl.py:1074: in _create
+    self.do_handshake()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ssl.SSLSocket [closed] fd=-1, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6>
+block = False
+
+    @_sslcopydoc
+    def do_handshake(self, block=False):
+        self._check_connected()
+        timeout = self.gettimeout()
+        try:
+            if timeout == 0.0 and block:
+                self.settimeout(None)
+>           self._sslobj.do_handshake()
+E           ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1147)
+
+/opt/miniconda3/envs/testbed/lib/python3.9/ssl.py:1343: SSLCertVerificationError
+
+During handling of the above exception, another exception occurred:
+
+self = <requests.adapters.HTTPAdapter object at 0x7c254dc40e80>
+request = <PreparedRequest [HEAD]>, stream = False, timeout = None
+verify = True, cert = None, proxies = OrderedDict()
+
+    def send(self, request, stream=False, timeout=None, verify=True, cert=None, proxies=None):
+        """Sends PreparedRequest object. Returns Response object."""
+    
+        conn = self.get_connection(request.url, proxies)
+    
+        self.cert_verify(conn, request.url, verify, cert)
+        url = self.request_url(request, proxies)
+    
+        chunked = not (request.body is None or 'Content-Length' in request.headers)
+    
+        try:
+            if not chunked:
+>               resp = conn.urlopen(
+                    method=request.method,
+                    url=url,
+                    body=request.body,
+                    headers=request.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.max_retries,
+                    timeout=timeout
+                )
+
+requests/adapters.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <requests.packages.urllib3.connectionpool.HTTPSConnectionPool object at 0x7c254dc400a0>
+method = 'HEAD', url = '/users/kennethreitz/repos?page=1&per_page=10'
+body = None
+headers = {'User-Agent': 'python-requests/1.1.0 CPython/3.9.20 Linux/6.18.33.2-microsoft-standard-WSL2', 'Accept-Encoding': 'gzip, deflate, compress', 'Accept': '*/*'}
+retries = 0, redirect = False, assert_same_host = False, timeout = None
+pool_timeout = None, release_conn = False
+response_kw = {'decode_content': False, 'preload_content': False}
+conn = <requests.packages.urllib3.connectionpool.VerifiedHTTPSConnection object at 0x7c254dc40ee0>
+
+    def urlopen(self, method, url, body=None, headers=None, retries=3,
+                redirect=True, assert_same_host=True, timeout=_Default,
+                pool_timeout=None, release_conn=None, **response_kw):
+        """
+        Get a connection from the pool and perform an HTTP request. This is the
+        lowest level call for making a request, so you'll need to specify all
+        the raw details.
+    
+        .. note::
+    
+           More commonly, it's appropriate to use a convenience method provided
+           by :class:`.RequestMethods`, such as :meth:`request`.
+    
+        .. note::
+    
+           `release_conn` will only behave as expected if
+           `preload_content=False` because we want to make
+           `preload_content=False` the default behaviour someday soon without
+           breaking backwards compatibility.
+    
+        :param method:
+            HTTP request method (such as GET, POST, PUT, etc.)
+    
+        :param body:
+            Data to send in the request body (useful for creating
+            POST requests, see HTTPConnectionPool.post_url for
+            more convenience).
+    
+        :param headers:
+            Dictionary of custom headers to send, such as User-Agent,
+            If-None-Match, etc. If None, pool headers are used. If provided,
+            these headers completely replace any pool-specific headers.
+    
+        :param retries:
+            Number of retries to allow before raising a MaxRetryError exception.
+    
+        :param redirect:
+            If True, automatically handle redirects (status codes 301, 302,
+            303, 307). Each redirect counts as a retry.
+    
+        :param assert_same_host:
+            If ``True``, will make sure that the host of the pool requests is
+            consistent else will raise HostChangedError. When False, you can
+            use the pool on an HTTP proxy and request foreign hosts.
+    
+        :param timeout:
+            If specified, overrides the default timeout for this one request.
+    
+        :param pool_timeout:
+            If set and the pool is set to block=True, then this method will
+            block for ``pool_timeout`` seconds and raise EmptyPoolError if no
+            connection is available within the time period.
+    
+        :param release_conn:
+            If False, then the urlopen call will not release the connection
+            back into the pool once a response is received (but will release if
+            you read the entire contents of the response such as when
+            `preload_content=True`). This is useful if you're not preloading
+            the response's content immediately. You will need to call
+            ``r.release_conn()`` on the response ``r`` to return the connection
+            back into the pool. If None, it takes the value of
+            ``response_kw.get('preload_content', True)``.
+    
+        :param \**response_kw:
+            Additional parameters are passed to
+            :meth:`urllib3.response.HTTPResponse.from_httplib`
+        """
+        if headers is None:
+            headers = self.headers
+    
+        if retries < 0:
+            raise MaxRetryError(self, url)
+    
+        if timeout is _Default:
+            timeout = self.timeout
+    
+        if release_conn is None:
+            release_conn = response_kw.get('preload_content', True)
+    
+        # Check host
+        if assert_same_host and not self.is_same_host(url):
+            host = "%s://%s" % (self.scheme, self.host)
+            if self.port:
+                host = "%s:%d" % (host, self.port)
+    
+            raise HostChangedError(self, url, retries - 1)
+    
+        conn = None
+    
+        try:
+            # Request a connection from the queue
+            conn = self._get_conn(timeout=pool_timeout)
+    
+            # Make the request on the httplib connection object
+            httplib_response = self._make_request(conn, method, url,
+                                                  timeout=timeout,
+                                                  body=body, headers=headers)
+    
+            # If we're going to release the connection in ``finally:``, then
+            # the request doesn't need to know about the connection. Otherwise
+            # it will also try to release it and we'll have a double-release
+            # mess.
+            response_conn = not release_conn and conn
+    
+            # Import httplib's response into our own wrapper object
+            response = HTTPResponse.from_httplib(httplib_response,
+                                                 pool=self,
+                                                 connection=response_conn,
+                                                 **response_kw)
+    
+            # else:
+            #     The connection will be put back into the pool when
+            #     ``response.release_conn()`` is called (implicitly by
+            #     ``response.read()``)
+    
+        except Empty as e:
+            # Timed out by queue
+            raise TimeoutError(self, "Request timed out. (pool_timeout=%s)" %
+                               pool_timeout)
+    
+        except SocketTimeout as e:
+            # Timed out by socket
+            raise TimeoutError(self, "Request timed out. (timeout=%s)" %
+                               timeout)
+    
+        except BaseSSLError as e:
+            # SSL certificate error
+>           raise SSLError(e)
+E           requests.packages.urllib3.exceptions.SSLError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1147)
+
+requests/packages/urllib3/connectionpool.py:451: SSLError
+
+During handling of the above exception, another exception occurred:
+
+self = <test_requests.RequestsTestCase testMethod=test_links>
+
+    def test_links(self):
+        url = 'https://api.github.com/users/kennethreitz/repos?page=1&per_page=10'
+>       r = requests.head(url=url)
+
+test_requests.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+requests/api.py:76: in head
+    return request('head', url, **kwargs)
+requests/api.py:44: in request
+    return session.request(method=method, url=url, **kwargs)
+requests/sessions.py:280: in request
+    resp = self.send(prep, stream=stream, timeout=timeout, verify=verify, cert=cert, proxies=proxies)
+requests/sessions.py:373: in send
+    r = adapter.send(request, **kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <requests.adapters.HTTPAdapter object at 0x7c254dc40e80>
+request = <PreparedRequest [HEAD]>, stream = False, timeout = None
+verify = True, cert = None, proxies = OrderedDict()
+
+    def send(self, request, stream=False, timeout=None, verify=True, cert=None, proxies=None):
+        """Sends PreparedRequest object. Returns Response object."""
+    
+        conn = self.get_connection(request.url, proxies)
+    
+        self.cert_verify(conn, request.url, verify, cert)
+        url = self.request_url(request, proxies)
+    
+        chunked = not (request.body is None or 'Content-Length' in request.headers)
+    
+        try:
+            if not chunked:
+                resp = conn.urlopen(
+                    method=request.method,
+                    url=url,
+                    body=request.body,
+                    headers=request.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=False,
+                    decode_content=False,
+                    retries=self.max_retries,
+                    timeout=timeout
+                )
+    
+            # Send the request.
+            else:
+                if hasattr(conn, 'proxy_pool'):
+                    conn = conn.proxy_pool
+    
+                low_conn = conn._get_conn(timeout=timeout)
+                low_conn.putrequest(request.method, url, skip_accept_encoding=True)
+    
+                for header, value in request.headers.items():
+                    low_conn.putheader(header, value)
+    
+                low_conn.endheaders()
+    
+                for i in request.body:
+                    low_conn.send(hex(len(i))[2:].encode('utf-8'))
+                    low_conn.send(b'\r\n')
+                    low_conn.send(i)
+                    low_conn.send(b'\r\n')
+                low_conn.send(b'0\r\n\r\n')
+    
+                r = low_conn.getresponse()
+                resp = HTTPResponse.from_httplib(r,
+                    pool=conn,
+                    connection=low_conn,
+                    preload_content=False,
+                    decode_content=False
+                )
+    
+        except socket.error as sockerr:
+            raise ConnectionError(sockerr)
+    
+        except MaxRetryError as e:
+            raise ConnectionError(e)
+    
+        except (_SSLError, _HTTPError) as e:
+            if isinstance(e, _SSLError):
+>               raise SSLError(e)
+E               requests.exceptions.SSLError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1147)
+
+requests/adapters.py:210: SSLError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED test_requests.py::RequestsTestCase::test_BASICAUTH_TUPLE_HTTP_200_OK_GET
+PASSED test_requests.py::RequestsTestCase::test_HTTP_200_OK_GET_ALTERNATIVE
+PASSED test_requests.py::RequestsTestCase::test_HTTP_200_OK_GET_WITH_MIXED_PARAMS
+PASSED test_requests.py::RequestsTestCase::test_HTTP_200_OK_GET_WITH_PARAMS
+PASSED test_requests.py::RequestsTestCase::test_HTTP_200_OK_HEAD
+PASSED test_requests.py::RequestsTestCase::test_HTTP_200_OK_PUT
+PASSED test_requests.py::RequestsTestCase::test_HTTP_302_ALLOW_REDIRECT_GET
+PASSED test_requests.py::RequestsTestCase::test_POSTBIN_GET_POST_FILES
+PASSED test_requests.py::RequestsTestCase::test_POSTBIN_GET_POST_FILES_WITH_DATA
+PASSED test_requests.py::RequestsTestCase::test_basic_building
+PASSED test_requests.py::RequestsTestCase::test_custom_content_type
+PASSED test_requests.py::RequestsTestCase::test_decompress_gzip
+PASSED test_requests.py::RequestsTestCase::test_different_encodings_dont_break_post
+PASSED test_requests.py::RequestsTestCase::test_entry_points
+PASSED test_requests.py::RequestsTestCase::test_invalid_url
+PASSED test_requests.py::RequestsTestCase::test_no_content_length
+PASSED test_requests.py::RequestsTestCase::test_params_are_added_before_fragment
+PASSED test_requests.py::RequestsTestCase::test_path_is_not_double_encoded
+PASSED test_requests.py::RequestsTestCase::test_prepared_request_hook
+PASSED test_requests.py::RequestsTestCase::test_request_ok_set
+PASSED test_requests.py::RequestsTestCase::test_status_raising
+PASSED test_requests.py::RequestsTestCase::test_unicode_get
+PASSED test_requests.py::RequestsTestCase::test_urlencoded_get_query_multivalued_param
+PASSED test_requests.py::RequestsTestCase::test_user_agent_transfers
+FAILED test_requests.py::RequestsTestCase::test_DIGESTAUTH_WRONG_HTTP_401_GET
+FAILED test_requests.py::RequestsTestCase::test_DIGEST_HTTP_200_OK_GET - Attr...
+FAILED test_requests.py::RequestsTestCase::test_links - requests.exceptions.S...
+======================== 3 failed, 24 passed in 12.92s =========================
+Updated 1 path from 3b8ba30
+Downloading aiohttp (1.7MiB)
+Downloading chardet (1.4MiB)
+Downloading pandas (10.8MiB)
+Downloading pygments (1.2MiB)
+Downloading pyarrow (47.7MiB)
+Downloading virtualenv (5.1MiB)
+Downloading hf-xet (4.3MiB)
+Downloading numpy (16.1MiB)
+ Downloading pygments
+ Downloading chardet
+ Downloading aiohttp
+ Downloading hf-xet
+ Downloading virtualenv
+ Downloading pandas
+ Downloading numpy
+ Downloading pyarrow
+Installed 73 packages in 342ms
+SWEBench results starts here
+PASSED
+SWEBench results ends here

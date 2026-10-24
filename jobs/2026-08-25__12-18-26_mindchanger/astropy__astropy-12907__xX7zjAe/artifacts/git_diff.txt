@@ -1,0 +1,41 @@
+diff --git a/astropy/modeling/separable.py b/astropy/modeling/separable.py
+index a308e2729..f7ad40b80 100755
+--- a/astropy/modeling/separable.py
++++ b/astropy/modeling/separable.py
+@@ -304,12 +304,33 @@ def _separable(transform):
+     if (transform_matrix := transform._calculate_separability_matrix()) is not NotImplemented:
+         return transform_matrix
+     elif isinstance(transform, CompoundModel):
+-        sepleft = _separable(transform.left)
+-        sepright = _separable(transform.right)
+-        return _operators[transform.op](sepleft, sepright)
++        return _compound(transform)
+     elif isinstance(transform, Model):
+         return _coord_matrix(transform, 'left', transform.n_outputs)
+ 
++def _compound(transform):
++    """
++    Flattens a compound model operator tree and computes the separability matrix.
++    """
++    # Helper function to recursively flatten models with the same operator
++    def _get_flat_models(model, op):
++        if isinstance(model, CompoundModel) and model.op == op:
++            return _get_flat_models(model.left, op) + _get_flat_models(model.right, op)
++        return [model]
++
++    flat_models = _get_flat_models(transform, transform.op)
++
++    # Process these flattened models sequentially
++    # Start with the first two, then combine the result with the next, and so on.
++    if len(flat_models) == 1:
++        return _separable(flat_models[0])
++
++    result_matrix = _operators[transform.op](_separable(flat_models[0]), _separable(flat_models[1]))
++
++    for i in range(2, len(flat_models)):
++        result_matrix = _operators[transform.op](result_matrix, _separable(flat_models[i]))
++    return result_matrix
++
+ 
+ # Maps modeling operators to a function computing and represents the
+ # relationship of axes as an array of 0-es and 1-s

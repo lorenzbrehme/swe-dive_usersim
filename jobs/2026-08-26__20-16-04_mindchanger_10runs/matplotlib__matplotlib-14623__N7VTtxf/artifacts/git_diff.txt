@@ -1,0 +1,55 @@
+diff --git a/lib/matplotlib/axes/_base.py b/lib/matplotlib/axes/_base.py
+index da2dea6f5..b2c8a121c 100644
+--- a/lib/matplotlib/axes/_base.py
++++ b/lib/matplotlib/axes/_base.py
+@@ -3248,6 +3248,14 @@ class _AxesBase(martist.Artist):
+             right = old_right
+ 
+         if self.get_xscale() == 'log':
++            # We are not going to allow non-positive values on log-scaled axes.
++            if (left is not None and right is not None and left > right
++                    and right <= 0):
++                cbook._warn_external(
++                    'Attempted to set non-positive right xlim on a '
++                    'log-scaled axis.\n'
++                    'Invalid limit will be ignored.')
++                right = old_right
+             if left <= 0:
+                 cbook._warn_external(
+                     'Attempted to set non-positive left xlim on a '
+@@ -3260,6 +3268,10 @@ class _AxesBase(martist.Artist):
+                     'log-scaled axis.\n'
+                     'Invalid limit will be ignored.')
+                 right = old_right
++
++        if left is not None and right is not None and left > right:
++            self.xaxis.set_inverted(True)
++
+         if left == right:
+             cbook._warn_external(
+                 f"Attempting to set identical left == right == {left} results "
+@@ -3627,6 +3639,14 @@ class _AxesBase(martist.Artist):
+             top = old_top
+ 
+         if self.get_yscale() == 'log':
++            # We are not going to allow non-positive values on log-scaled axes.
++            if (bottom is not None and top is not None and bottom > top
++                    and top <= 0):
++                cbook._warn_external(
++                    'Attempted to set non-positive top ylim on a '
++                    'log-scaled axis.\n'
++                    'Invalid limit will be ignored.')
++                top = old_top
+             if bottom <= 0:
+                 cbook._warn_external(
+                     'Attempted to set non-positive bottom ylim on a '
+@@ -3639,6 +3659,9 @@ class _AxesBase(martist.Artist):
+                     'log-scaled axis.\n'
+                     'Invalid limit will be ignored.')
+                 top = old_top
++
++        if bottom is not None and top is not None and bottom > top:
++            self.yaxis.set_inverted(True)
+         if bottom == top:
+             cbook._warn_external(
+                 f"Attempting to set identical bottom == top == {bottom} "

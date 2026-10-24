@@ -1,0 +1,30 @@
+diff --git a/lib/matplotlib/colorbar.py b/lib/matplotlib/colorbar.py
+index c59b0ac815..0d57a7eeeb 100644
+--- a/lib/matplotlib/colorbar.py
++++ b/lib/matplotlib/colorbar.py
+@@ -651,8 +651,23 @@ class Colorbar:
+             if not self.drawedges:
+                 if len(self._y) >= self.n_rasterize:
+                     self.solids.set_rasterized(True)
+-        self.dividers.set_segments(
+-            np.dstack([X, Y])[1:-1] if self.drawedges else [])
++            if self.drawedges:
++                # Pre-calculate dstacked_xy to avoid redundant computations.
++                dstacked_xy = np.dstack([X, Y])
++                # Map 'extend' values to corresponding slices to correctly draw
++                # divider lines at colorbar boundaries, including extension triangles.
++                extend_slices = {
++                    'neither': dstacked_xy[1:-1],
++                    'min': dstacked_xy[:-1],
++                    'max': dstacked_xy[1:],
++                    'both': dstacked_xy,
++                }
++                # Use .get() with an empty list as a default for robustness,
++                # though 'extend' is typically validated.
++                segments = extend_slices.get(self.extend, [])
++                self.dividers.set_segments(segments)
++            else:
++                self.dividers.set_segments([])
+ 
+     def _add_solids_patches(self, X, Y, C, mappable):
+         hatches = mappable.hatches * len(C)  # Have enough hatches.

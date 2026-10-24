@@ -1,0 +1,121 @@
++ cd /testbed
++ set +x
++ python -m pip install -e .
+Obtaining file:///testbed
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Requirement already satisfied: mpmath>=0.19 in /opt/miniconda3/envs/testbed/lib/python3.9/site-packages (from sympy==1.5.dev0) (1.3.0)
+Installing collected packages: sympy
+  Attempting uninstall: sympy
+    Found existing installation: sympy 1.5.dev0
+    Uninstalling sympy-1.5.dev0:
+      Successfully uninstalled sympy-1.5.dev0
+  DEPRECATION: Legacy editable install of sympy==1.5.dev0 from file:///testbed (setup.py develop) is deprecated. pip 25.0 will enforce this behaviour change. A possible replacement is to add a pyproject.toml or enable --use-pep517, and use setuptools >= 64. If the resulting installation is not behaving as expected, try using --config-settings editable_mode=compat. Please consult the setuptools documentation for more information. Discussion can be found at https://github.com/pypa/pip/issues/11457
+  Running setup.py develop for sympy
+Successfully installed sympy
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
++ git checkout c50643a49811e9fe2f4851adff4313ad46f7325e sympy/crypto/tests/test_crypto.py
+Updated 0 paths from 61d840fb8
++ for path in sympy/crypto/tests/test_crypto.py
++ '[' -e sympy/crypto/tests/test_crypto.py ']'
++ git ls-files --error-unmatch -- sympy/crypto/tests/test_crypto.py
++ echo 'diff --git a/sympy/crypto/tests/test_crypto.py b/sympy/crypto/tests/test_crypto.py
+--- a/sympy/crypto/tests/test_crypto.py
++++ b/sympy/crypto/tests/test_crypto.py
+@@ -247,6 +247,8 @@ def test_encode_morse():
+     assert encode_morse('\'' '\'', sep='\''`'\'') == '\''``'\''
+     assert encode_morse('\'' '\'', sep='\''``'\'') == '\''````'\''
+     assert encode_morse('\''!@#$%^&*()_+'\'') == '\''-.-.--|.--.-.|...-..-|-.--.|-.--.-|..--.-|.-.-.'\''
++    assert encode_morse('\''12345'\'') == '\''.----|..---|...--|....-|.....'\''
++    assert encode_morse('\''67890'\'') == '\''-....|--...|---..|----.|-----'\''
+
+
+ def test_decode_morse():
+'
++ git apply --check /tmp/test_patch.diff
++ git apply /tmp/test_patch.diff
+++ mktemp
++ LOG_FILE=/tmp/tmp.Ldj8vvqWZY
++ export LOG_FILE
++ exec
++ exec
+++ tee /tmp/tmp.Ldj8vvqWZY
++ set +x
+============================= test process starts ==============================
+executable:         /opt/miniconda3/envs/testbed/bin/python  (3.9.20-final-0) [CPython]
+architecture:       64-bit
+cache:              no
+ground types:       python 
+numpy:              None
+random seed:        34234270
+hash randomization: on (PYTHONHASHSEED=2069282495)
+
+sympy/crypto/tests/test_crypto.py[44] 
+test_cycle_list ok
+test_encipher_shift ok
+test_encipher_rot13 ok
+test_encipher_affine ok
+test_encipher_atbash ok
+test_encipher_substitution ok
+test_check_and_join ok
+test_encipher_vigenere ok
+test_decipher_vigenere ok
+test_encipher_hill ok
+test_decipher_hill ok
+test_encipher_bifid5 ok
+test_bifid5_square ok
+test_decipher_bifid5 ok
+test_encipher_bifid6 ok
+test_decipher_bifid6 ok
+test_bifid6_square ok
+test_rsa_public_key ok
+test_rsa_private_key ok
+test_rsa_large_key ok
+test_encipher_rsa ok
+test_decipher_rsa ok
+test_kid_rsa_public_key ok
+test_kid_rsa_private_key ok
+test_encipher_kid_rsa ok
+test_decipher_kid_rsa ok
+test_encode_morse ok
+test_decode_morse ok
+test_lfsr_sequence ok
+test_lfsr_autocorrelation ok
+test_lfsr_connection_polynomial ok
+test_elgamal_private_key ok
+test_elgamal ok
+test_dh_private_key ok
+test_dh_public_key ok
+test_dh_shared_key ok
+test_padded_key ok
+test_bifid ok
+test_encipher_decipher_gm ok
+test_gm_private_key ok
+test_gm_public_key ok
+test_encipher_decipher_bg ok
+test_bg_private_key ok
+test_bg_public_key ok                                                       [OK]
+
+
+================== tests finished: 44 passed, in 2.20 seconds ==================
+Updated 1 path from 61d840fb8
+Downloading hf-xet (4.3MiB)
+Downloading virtualenv (5.1MiB)
+Downloading numpy (16.1MiB)
+Downloading pygments (1.2MiB)
+Downloading pyarrow (47.7MiB)
+Downloading aiohttp (1.7MiB)
+Downloading chardet (1.4MiB)
+Downloading pandas (10.8MiB)
+ Downloading pygments
+ Downloading chardet
+ Downloading aiohttp
+ Downloading hf-xet
+ Downloading virtualenv
+ Downloading numpy
+ Downloading pyarrow
+ Downloading pandas
+Installed 73 packages in 529ms
+SWEBench results starts here
+PASSED
+SWEBench results ends here

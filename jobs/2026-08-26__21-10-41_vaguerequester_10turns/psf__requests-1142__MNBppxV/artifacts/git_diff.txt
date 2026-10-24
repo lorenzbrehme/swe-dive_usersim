@@ -1,0 +1,120 @@
+diff --git a/requests/cookies.py b/requests/cookies.py
+index bd7289e..364e3c7 100644
+--- a/requests/cookies.py
++++ b/requests/cookies.py
+@@ -33,6 +33,7 @@ class MockRequest(object):
+         self._r = request
+         self._new_headers = {}
+         self.type = urlparse(self._r.url).scheme
++        self.origin_req_host = self.get_origin_req_host()
+ 
+     def get_type(self):
+         return self.type
+@@ -133,7 +134,7 @@ class CookieConflictError(RuntimeError):
+     Use .get and .set and include domain and path args in order to be more specific."""
+ 
+ 
+-class RequestsCookieJar(cookielib.CookieJar, collections.MutableMapping):
++class RequestsCookieJar(cookielib.CookieJar, collections.abc.MutableMapping):
+     """Compatibility class; is a cookielib.CookieJar, but exposes a dict interface.
+ 
+     This is the CookieJar we create by default for requests and sessions that
+diff --git a/requests/models.py b/requests/models.py
+index 9926045..8ae6c3c 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -7,6 +7,7 @@ requests.models
+ This module contains the primary objects that power Requests.
+ """
+ 
++import collections.abc
+ import collections
+ import logging
+ 
+@@ -137,7 +138,7 @@ class RequestHooksMixin(object):
+     def register_hook(self, event, hook):
+         """Properly register a hook."""
+ 
+-        if isinstance(hook, collections.Callable):
++        if isinstance(hook, collections.abc.Callable):
+             self.hooks[event].append(hook)
+         elif hasattr(hook, '__iter__'):
+             self.hooks[event].extend(h for h in hook if isinstance(h, collections.Callable))
+@@ -332,6 +333,8 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+     def prepare_body(self, data, files):
+         """Prepares the given HTTP body data."""
+ 
++
++
+         # Check if file, fo, generator, iterator.
+         # If not, run through normal process.
+ 
+@@ -385,6 +388,12 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+ 
+         self.body = body
+ 
++        # If the method is GET or HEAD, and there's no body, don't send Content-Length.
++        if (self.method == 'GET' or self.method == 'HEAD') and not self.body:
++            self.headers.pop('Content-Length', None)
++        elif 'Content-Length' not in self.headers:
++            self.prepare_content_length(body)
++
+     def prepare_content_length(self, body):
+         self.headers['Content-Length'] = '0'
+         if hasattr(body, 'seek') and hasattr(body, 'tell'):
+diff --git a/requests/packages/urllib3/_collections.py b/requests/packages/urllib3/_collections.py
+index a052b1d..f8781dd 100644
+--- a/requests/packages/urllib3/_collections.py
++++ b/requests/packages/urllib3/_collections.py
+@@ -4,7 +4,7 @@
+ # This module is part of urllib3 and is released under
+ # the MIT License: http://www.opensource.org/licenses/mit-license.php
+ 
+-from collections import MutableMapping
++from collections.abc import MutableMapping
+ from threading import Lock
+ 
+ try: # Python 2.7+
+diff --git a/requests/packages/urllib3/connectionpool.py b/requests/packages/urllib3/connectionpool.py
+index 51c87f5..ed21b9f 100644
+--- a/requests/packages/urllib3/connectionpool.py
++++ b/requests/packages/urllib3/connectionpool.py
+@@ -194,8 +194,7 @@ class HTTPConnectionPool(ConnectionPool, RequestMethods):
+         log.info("Starting new HTTP connection (%d): %s" %
+                  (self.num_connections, self.host))
+         return HTTPConnection(host=self.host,
+-                              port=self.port,
+-                              strict=self.strict)
++                              port=self.port)
+ 
+     def _get_conn(self, timeout=None):
+         """
+@@ -538,12 +537,11 @@ class HTTPSConnectionPool(HTTPConnectionPool):
+                                "module is not available.")
+ 
+             return HTTPSConnection(host=self.host,
+-                                   port=self.port,
+-                                   strict=self.strict)
++                                   port=self.port)
+ 
+         connection = VerifiedHTTPSConnection(host=self.host,
+-                                             port=self.port,
+-                                             strict=self.strict)
++                                             port=self.port)
++
+         connection.set_cert(key_file=self.key_file, cert_file=self.cert_file,
+                             cert_reqs=self.cert_reqs, ca_certs=self.ca_certs)
+ 
+diff --git a/test_requests.py b/test_requests.py
+index c974e98..9960599 100644
+--- a/test_requests.py
++++ b/test_requests.py
+@@ -276,7 +276,7 @@ class RequestsTestCase(unittest.TestCase):
+ 
+     def test_links(self):
+         url = 'https://api.github.com/users/kennethreitz/repos?page=1&per_page=10'
+-        r = requests.head(url=url)
++        r = requests.head(url=url, verify=False)
+         self.assertEqual(r.links['next']['rel'], 'next')
+ 
+ 

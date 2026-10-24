@@ -1,0 +1,48 @@
+diff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py
+index 8419dc0d54..806c46a69d 100644
+--- a/django/db/models/sql/query.py
++++ b/django/db/models/sql/query.py
+@@ -208,6 +208,16 @@ class Query(BaseExpression):
+     annotation_select_mask = None
+     _annotation_select_cache = None
+ 
++    def set_annotation_mask(self, mask):
++        self.annotation_select_mask = mask
++        self._annotation_select_cache = None
++
++    def append_annotation_mask(self, new_aliases):
++        if self.annotation_select_mask is None:
++            self.annotation_select_mask = set()
++        self.annotation_select_mask.update(new_aliases)
++        self._annotation_select_cache = None
++
+     # Set combination attributes.
+     combinator = None
+     combinator_all = False
+@@ -1106,16 +1116,23 @@ class Query(BaseExpression):
+                 "semicolons, or SQL comments."
+             )
+ 
+-    def add_annotation(self, annotation, alias, is_summary=False, select=True):
++    def add_annotation(self, annotation, alias, is_summary=False, select=True, mask_reset=False):
+         """Add a single annotation expression to the Query."""
+         self.check_alias(alias)
+         annotation = annotation.resolve_expression(
+             self, allow_joins=True, reuse=None, summarize=is_summary
+         )
+-        if select:
++        if mask_reset:
++            self.set_annotation_mask(set([alias]) if select else set())
++        elif select:
+             self.append_annotation_mask([alias])
+         else:
+-            self.set_annotation_mask(set(self.annotation_select).difference({alias}))
++            # If select is False, and not mask_reset, it means we are trying to deselect a specific alias.
++            # We should only remove it if it exists in the mask.
++            if self.annotation_select_mask is not None and alias in self.annotation_select_mask:
++                new_mask = self.annotation_select_mask.copy()
++                new_mask.remove(alias)
++                self.set_annotation_mask(new_mask)
+         self.annotations[alias] = annotation
+ 
+     def resolve_expression(self, query, *args, **kwargs):

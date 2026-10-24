@@ -1,0 +1,8 @@
+── BASE_MODE ── running standard benchmark task (single turn).
+[AGENT_RESP] The bug where `__in` doesn't clear selected fields on the RHS when `QuerySet.alias()` is used after `annotate()` has been fixed.
+
+The root cause was identified in `django/db/models/lookups.py` within the `In.get_prep_lookup()` method. The condition `if not self.rhs.has_select_fields:` prevented the necessary clearing of selected fields and the explicit selection of only the primary key when an annotated QuerySet was used as the right-hand side of an `__in` lookup. This resulted in the subquery returning multiple columns instead of the expected single primary key column, leading to the `django.db.utils.OperationalError`.
+
+The fix involved removing the aforementioned conditional statement, ensuring that the `clear_select_clause()` and `add_fields(["pk"])` methods are always executed when a QuerySet is used in an `__in` lookup. This guarantees that only the primary key is selected from the subquery, regardless of any preceding `annotate()` or `alias()` calls.
+
+The provided test case now passes successfully, confirming the resolution of the bug.

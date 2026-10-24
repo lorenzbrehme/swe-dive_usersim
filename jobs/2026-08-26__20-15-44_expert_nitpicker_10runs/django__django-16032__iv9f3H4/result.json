@@ -1,0 +1,121 @@
+{
+    "id": "fdfc2cf7-0a57-43c2-af95-8bb00dce1747",
+    "task_name": "swe-bench/django__django-16032",
+    "trial_name": "django__django-16032__iv9f3H4",
+    "trial_uri": "file:///mnt/qt-qe-mt-bench/swe-dive/jobs/2026-08-26__20-15-44/django__django-16032__iv9f3H4",
+    "task_id": {
+        "org": "swe-bench",
+        "name": "django__django-16032",
+        "ref": "sha256:fbf2a8f3dc8d8d71a761101f9d7dca1e8fe85dd2447d9390e62fd392631530ae"
+    },
+    "source": "swe-bench/swe-bench-verified",
+    "task_checksum": "51a56e1e04e330f409219f3d917c517a6a3efea222f3106ce80882fba04929d6",
+    "config": {
+        "task": {
+            "path": null,
+            "git_url": null,
+            "git_commit_id": null,
+            "name": "swe-bench/django__django-16032",
+            "ref": "sha256:fbf2a8f3dc8d8d71a761101f9d7dca1e8fe85dd2447d9390e62fd392631530ae",
+            "overwrite": false,
+            "download_dir": null,
+            "source": "swe-bench/swe-bench-verified"
+        },
+        "trial_name": "django__django-16032__iv9f3H4",
+        "trials_dir": "jobs/2026-08-26__20-15-44",
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "swe-dive-user-sim-acp/opencode",
+            "import_path": "swe_dive.harbor_agents.user_sim_agent:UserSimAcpAgent",
+            "model_name": "gemini/gemini-2.5-flash",
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {
+                "registry_spec": "acp:opencode",
+                "persona": "EXPERT_NITPICKER",
+                "coding_mode": "COLLABORATIVE",
+                "max_turns": 10,
+                "sim_model": "gemini/gemini-3.6-flash",
+                "validation_model": "gemini/gemini-2.5-flash-lite",
+                "agent_model": "gemini/gemini-2.5-flash"
+            },
+            "env": {},
+            "mcp_servers": []
+        },
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "env": {},
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "env": {},
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "job_id": "fd207bea-7f4a-4058-8af7-bf8047e47975"
+    },
+    "agent_info": {
+        "name": "swe-dive-user-sim-acp/opencode",
+        "version": "1.18.23",
+        "model_info": {
+            "name": "gemini-2.5-flash",
+            "provider": "gemini"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 11803,
+        "n_cache_tokens": null,
+        "n_output_tokens": 1072,
+        "cost_usd": 0.012872249999999998,
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-08-26T18:44:36.272889Z",
+    "finished_at": "2026-08-26T18:47:29.612911Z",
+    "environment_setup": {
+        "started_at": "2026-08-26T18:44:36.358706Z",
+        "finished_at": "2026-08-26T18:45:13.908639Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-08-26T18:45:13.908665Z",
+        "finished_at": "2026-08-26T18:46:00.700945Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-08-26T18:46:00.701012Z",
+        "finished_at": "2026-08-26T18:46:56.074258Z"
+    },
+    "verifier": {
+        "started_at": "2026-08-26T18:46:56.445844Z",
+        "finished_at": "2026-08-26T18:47:17.490090Z"
+    },
+    "step_results": null
+}

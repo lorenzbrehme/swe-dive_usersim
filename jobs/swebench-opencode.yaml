@@ -1,0 +1,19 @@
+# Requires an LLM provider API key (e.g. OPENAI_API_KEY, ANTHROPIC_API_KEY).
+datasets:
+  - name: swe-bench/swe-bench-verified
+    task_names:
+      - swe-bench/astropy__astropy-12907
+
+agents:
+  - name: swe-dive-user-sim-acp/opencode
+    import_path: swe_dive.harbor_agents.user_sim_agent:UserSimAcpAgent
+    kwargs:
+      registry_spec: "acp:opencode"
+      persona: MIND_CHANGER
+      coding_mode: COLLABORATIVE
+      max_turns: 10
+      sim_model: gemini/gemini-3.6-flash
+      validation_model: gemini/gemini-2.5-flash-lite
+      agent_model: gemini/gemini-2.5-flash
+
+n_concurrent_trials: 4

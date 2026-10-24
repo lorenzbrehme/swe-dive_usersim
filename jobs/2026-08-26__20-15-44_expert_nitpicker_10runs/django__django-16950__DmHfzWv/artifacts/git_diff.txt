@@ -1,0 +1,44 @@
+diff --git a/django/forms/models.py b/django/forms/models.py
+index 3fa04b821f..ce99929445 100644
+--- a/django/forms/models.py
++++ b/django/forms/models.py
+@@ -1131,6 +1131,24 @@ class BaseInlineFormSet(BaseModelFormSet):
+                 form.data._mutable = mutable
+ 
+         # Set the fk value here so that the form can do its validation.
++        if self.instance._state.adding:
++            # Evaluate the `to_field` default on `self.instance` if it's currently
++            # None. This handles cases like UUIDField with default values.
++            if self.fk.remote_field.field_name != self.fk.remote_field.model._meta.pk.name:
++                # Get the actual field object on the parent model that the FK points to
++                to_field = self.instance._meta.get_field(self.fk.remote_field.field_name)
++            else:
++                to_field = self.instance._meta.pk
++
++            if (
++                to_field.has_default()
++                and getattr(self.instance, to_field.attname) is None
++            ):
++                setattr(
++                    self.instance,
++                    to_field.attname,
++                    to_field.get_default(),
++                )
+         fk_value = self.instance.pk
+         if self.fk.remote_field.field_name != self.fk.remote_field.model._meta.pk.name:
+             fk_value = getattr(self.instance, self.fk.remote_field.field_name)
+@@ -1172,13 +1190,7 @@ class BaseInlineFormSet(BaseModelFormSet):
+ 
+         # If we're adding a new object, ignore a parent's auto-generated key
+         # as it will be regenerated on the save request.
+-        if self.instance._state.adding:
+-            if kwargs.get("to_field") is not None:
+-                to_field = self.instance._meta.get_field(kwargs["to_field"])
+-            else:
+-                to_field = self.instance._meta.pk
+-            if to_field.has_default():
+-                setattr(self.instance, to_field.attname, None)
++
+ 
+         form.fields[name] = InlineForeignKeyField(self.instance, **kwargs)
+ 

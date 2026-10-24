@@ -1,0 +1,85 @@
+SUMMARY
+condition	resolved	all_target_tests_passed	introduced_regression	mean_std_turns_per_recorded_instance	instances_with_turn_data
+Expert Nitpicker	4/11	6/11	5/11	3.27 ± 1.35	11/11
+Mind Changer	4/11	6/11	4/11	3.36 ± 1.03	11/11
+Vague Requester	3/11	4/11	5/11	2.73 ± 2.57	11/11
+Base_mode	3/11	4/11	2/11	1.00 ± 0.00	11/11
+
+RESOURCE MEANS
+condition	instances_with_resource_data	mean_std_input_tokens_per_recorded_instance	mean_std_output_tokens_per_recorded_instance	mean_std_distinct_files_read_per_recorded_instance	mean_std_distinct_files_edited_per_recorded_instance
+Expert Nitpicker	11	71551.3 ± 94876.2	321.4 ± 294.4	2.00 ± 1.41	1.36 ± 0.67
+Mind Changer	11	43494.5 ± 42224.0	574.7 ± 509.9	2.45 ± 1.69	2.45 ± 2.11
+Vague Requester	11	25154.8 ± 41101.4	866.0 ± 2016.3	4.64 ± 3.20	2.45 ± 1.86
+Base_mode	11	18014.7 ± 26904.5	216.7 ± 158.9	2.09 ± 2.21	2.27 ± 2.45
+
+DELTA VS BASE_MODE (mean, no std)
+condition	delta_mean_turns	delta_mean_input_tokens	delta_mean_output_tokens	delta_mean_files_read	delta_mean_files_edited
+Expert Nitpicker	+2.27	+53536.5	+104.6	-0.09	-0.91
+Mind Changer	+2.36	+25479.8	+358.0	+0.36	+0.18
+Vague Requester	+1.73	+7140.1	+649.3	+2.55	+0.18
+
+DETAILED VERIFIER RESULTS
+condition	task	resolved	FAIL_TO_PASS	PASS_TO_FAIL	turns	input_tokens	output_tokens	files_read	files_edited
+Expert Nitpicker	django__django-10554	false	0/2	1/23	6	216636	594	2	2
+Expert Nitpicker	django__django-14311	false	1/1	3/59	2	30213	82	1	1
+Expert Nitpicker	django__django-16032	false	0/2	1/77	3	3280	149	1	1
+Expert Nitpicker	django__django-16938	false	18/23	0/65	2	17195	152	2	1
+Expert Nitpicker	django__django-16950	false	1/1	3/3	3	45757	487	1	1
+Expert Nitpicker	matplotlib__matplotlib-14623	false	0/1	0/400	4	103052	177	1	1
+Expert Nitpicker	matplotlib__matplotlib-22865	true	3/3	0/57	3	3096	151	4	1
+Expert Nitpicker	psf__requests-1142	true	1/1	0/5	2	1161	88	1	1
+Expert Nitpicker	pytest-dev__pytest-7236	false	0/1	1/51	5	51488	522	3	2
+Expert Nitpicker	sympy__sympy-16886	true	1/1	0/42	2	28881	128	1	1
+Expert Nitpicker	astropy__astropy-12907	true	2/2	0/13	4	286305	1005	5	3
+Mind Changer	django__django-10554	false	0/2	1/23	3	86739	458	5	2
+Mind Changer	django__django-14311	false	1/1	3/59	3	48295	297	1	1
+Mind Changer	django__django-16032	false	2/2	17/77	5	6421	915	2	3
+Mind Changer	django__django-16938	true	23/23	0/65	3	6026	740	5	6
+Mind Changer	django__django-16950	false	0/1	0/3	4	26391	1704	2	1
+Mind Changer	matplotlib__matplotlib-14623	false	0/1	0/400	3	2898	255	2	2
+Mind Changer	matplotlib__matplotlib-22865	false	1/3	1/57	2	39046	213	1	1
+Mind Changer	psf__requests-1142	true	1/1	0/5	4	138540	1150	5	7
+Mind Changer	pytest-dev__pytest-7236	false	0/1	0/51	3	3577	117	2	2
+Mind Changer	sympy__sympy-16886	true	1/1	0/42	2	62259	26	1	1
+Mind Changer	astropy__astropy-12907	true	2/2	0/13	5	58248	447	1	1
+Vague Requester	django__django-10554	false	0/2	0/23	1	1026	151	5	1
+Vague Requester	django__django-14311	false	0/1	3/59	2	13406	352	2	1
+Vague Requester	django__django-16032	false	0/2	0/77	1	42528	216	5	3
+Vague Requester	django__django-16938	true	23/23	0/65	1	2454	0	9	4
+Vague Requester	django__django-16950	false	0/1	2/3	3	6184	435	2	1
+Vague Requester	matplotlib__matplotlib-14623	false	0/1	0/400	10	141302	6904	8	5
+Vague Requester	matplotlib__matplotlib-22865	false	1/3	1/57	3	37597	127	1	1
+Vague Requester	psf__requests-1142	true	1/1	0/5	3	1983	35	9	6
+Vague Requester	pytest-dev__pytest-7236	false	0/1	1/51	2	12163	533	2	1
+Vague Requester	sympy__sympy-16886	true	1/1	0/42	1	1116	28	1	1
+Vague Requester	astropy__astropy-12907	false	2/2	10/13	3	16944	745	7	3
+Base_mode	django__django-10554	false	0/2	0/23	1	9370	76	0	0
+Base_mode	django__django-14311	false	1/1	3/59	1	1503	59	2	1
+Base_mode	django__django-16032	true	2/2	0/77	1	2863	236	6	3
+Base_mode	django__django-16938	false	0/23	0/65	1	1252	525	0	9
+Base_mode	django__django-16950	false	0/1	0/3	1	7763	336	0	3
+Base_mode	matplotlib__matplotlib-14623	false	0/1	0/400	1	44126	110	3	2
+Base_mode	matplotlib__matplotlib-22865	false	1/3	1/57	1	86640	379	4	2
+Base_mode	psf__requests-1142	false	0/1	0/5	1	9916	157	0	0
+Base_mode	pytest-dev__pytest-7236	false	0/1	0/51	1	33086	351	0	1
+Base_mode	sympy__sympy-16886	true	1/1	0/42	1	413	78	4	2
+Base_mode	astropy__astropy-12907	true	2/2	0/13	1	1230	77	4	2
+
+TRIALS WITH AGGREGATE REWARD ONLY
+condition	trial	resolved
+
+ASTROPY 12907 FIGURE DATA
+condition	resolved	turns	full_diff_changed_files	full_diff_lines	file_names
+Expert Nitpicker	true	4	2	-3/+2	astropy/modeling/core.py,astropy/modeling/separable.py
+Mind Changer	true	5	1	-3/+24	astropy/modeling/separable.py
+Vague Requester	false	3	2	-178/+49	astropy/modeling/separable.py,tox.ini
+Base_mode	true	1	3	-2/+31	astropy/modeling/separable.py,astropy/modeling/tests/test_separable.py,pytest_output.txt
+
+DEFINITIONS
+Summary outcome denominators include 10 pilot tasks plus Astropy.
+Turn and resource means include only instances with detailed artifacts.
+Token counts: conversation.json agent_usage input/output fields.
+File counts are absolute distinct ACP locations, not paper deltas.
+Regressions: failures in the verifier PASS_TO_PASS set.
+Diff statistics: complete final conversation.json git_diff.
+Paper token/file deltas need baseline and ground-truth data not on submission.

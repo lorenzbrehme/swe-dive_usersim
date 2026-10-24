@@ -1,0 +1,18 @@
+# Requires an LLM provider API key (e.g. OPENAI_API_KEY, ANTHROPIC_API_KEY).
+datasets:
+  - name: swe-bench/swe-bench-verified
+    task_names:
+      - swe-bench/astropy__astropy-12907
+
+agents:
+  - name: swe-dive-user-sim-acp/pi-acp
+    import_path: swe_dive.harbor_agents.user_sim_agent:UserSimAcpAgent
+    kwargs:
+      registry_spec: "acp:pi-acp"
+      persona: EXPERT_NITPICKER
+      coding_mode: COLLABORATIVE
+      max_turns: 10
+      sim_model: gemini/gemini-2.5-flash
+      validation_model: gemini/gemini-2.5-flash-lite
+      agent_model: openrouter/openai/gpt-oss-120b
+concurrency: 1

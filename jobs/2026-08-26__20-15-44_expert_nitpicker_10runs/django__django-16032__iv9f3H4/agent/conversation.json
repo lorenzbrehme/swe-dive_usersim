@@ -1,0 +1,109 @@
+{
+  "sim_response": [
+    {
+      "user_message": "We're seeing `OperationalError: sub-select returns 10 columns - expected 1` when filtering with `__in` on a subquery that chains `alias()` after `annotate()`. Take a look at how `In` in `django/db/models/lookups.py` prepares the RHS subquery and clears select fields.",
+      "agent_response": "I've updated the `In.get_prep_lookup` method in `django/db/models/lookups.py` to ensure that subqueries used with `__in` always return a single column, even when `annotate()` and `alias()` are used. This should prevent the `OperationalError`.",
+      "agent_changes": "diff --git a/django/db/models/lookups.py b/django/db/models/lookups.py\nindex 866e38df83..c7de6353a7 100644\n--- a/django/db/models/lookups.py\n+++ b/django/db/models/lookups.py\n@@ -419,10 +419,30 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):\n         from django.db.models.sql.query import Query  # avoid circular import\n \n         if isinstance(self.rhs, Query):\n+            # If the query is already \"multi-valued\" then the columns will be\n+            # properly set and we don't need to do anything.\n+            if self.rhs._has_limited_fields:\n+                return super().get_prep_lookup()\n             self.rhs.clear_ordering(clear_default=True)\n+            # If the QuerySet is not limited to a single field, select the\n+            # primary key.\n             if not self.rhs.has_select_fields:\n                 self.rhs.clear_select_clause()\n                 self.rhs.add_fields([\"pk\"])\n+            # If the QuerySet has select_fields, ensure it's limited to 1.\n+            # This is important for .annotate().alias() cases.\n+            elif len(self.rhs.target_fields) > 1:\n+                # Store any existing annotations that are not already selected.\n+                annotations = {}\n+                for alias, expression in self.rhs.query.annotations.items():\n+                    if alias not in self.rhs.query.select:\n+                        annotations[alias] = expression\n+                # Clear all select fields and add only the primary key.\n+                self.rhs.clear_select_clause()\n+                self.rhs.add_fields([\"pk\"])\n+                # Add back any original annotations.\n+                for alias, expression in annotations.items():\n+                    self.rhs.annotate(**{alias: expression})\n         return super().get_prep_lookup()\n \n     def process_rhs(self, compiler, connection):\n",
+      "subtask_list": [
+        "Locate where the RHS subquery select fields and annotation masks are cleared during lookup processing in django/db/models/lookups.py.",
+        "Adjust the subquery selection clearing logic in django/db/models/sql/query.py so that `set_annotation_mask` accounts for aliases set after annotations.",
+        "Refine the annotation mask calculation to ensure alias attributes are stripped from the target select clause without discarding active annotation values."
+      ],
+      "tool_calls": [
+        {
+          "tool_call_id": "F5DKrtVBep4H9CRx",
+          "function_name": "search",
+          "arguments": {},
+          "output": null
+        },
+        {
+          "tool_call_id": "fXa2W3Qv94ilt0yv",
+          "function_name": "file_read",
+          "arguments": {},
+          "output": null
+        },
+        {
+          "tool_call_id": "CTTN2A8sQxTRNO40",
+          "function_name": "file_edit",
+          "arguments": {},
+          "output": null
+        }
+      ]
+    },
+    {
+      "user_message": "don't re-add annotations using `self.rhs.annotate()` inside `get_prep_lookup`. just clear the select clause using `clear_select_clause(true)` directly on `self.rhs`.",
+      "agent_response": "I've updated the `In.get_prep_lookup` method as requested. It now clears all select fields, including annotations, using `self.rhs.clear_select_clause(True)` when the subquery has multiple select fields, ensuring only the primary key is selected.",
+      "agent_changes": "diff --git a/django/db/models/lookups.py b/django/db/models/lookups.py\nindex 866e38df83..40773f3f37 100644\n--- a/django/db/models/lookups.py\n+++ b/django/db/models/lookups.py\n@@ -419,10 +419,22 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):\n         from django.db.models.sql.query import Query  # avoid circular import\n \n         if isinstance(self.rhs, Query):\n+            # If the query is already \"multi-valued\" then the columns will be\n+            # properly set and we don't need to do anything.\n+            if self.rhs._has_limited_fields:\n+                return super().get_prep_lookup()\n             self.rhs.clear_ordering(clear_default=True)\n+            # If the QuerySet is not limited to a single field, select the\n+            # primary key.\n             if not self.rhs.has_select_fields:\n                 self.rhs.clear_select_clause()\n                 self.rhs.add_fields([\"pk\"])\n+            # If the QuerySet has select_fields, ensure it's limited to 1.\n+            # This is important for .annotate().alias() cases.\n+            elif len(self.rhs.target_fields) > 1:\n+                # Clear all select fields including any from annotations.\n+                self.rhs.clear_select_clause(True)\n+                self.rhs.add_fields([\"pk\"])\n         return super().get_prep_lookup()\n \n     def process_rhs(self, compiler, connection):\n",
+      "subtask_list": [
+        "Locate where the RHS subquery select fields and annotation masks are cleared during lookup processing in django/db/models/lookups.py.",
+        "Adjust the subquery selection clearing logic in django/db/models/sql/query.py so that `set_annotation_mask` accounts for aliases set after annotations.",
+        "Refine the annotation mask calculation to ensure alias attributes are stripped from the target select clause without discarding active annotation values."
+      ],
+      "tool_calls": [
+        {
+          "tool_call_id": "VIGiktOF3ghurSx6",
+          "function_name": "file_read",
+          "arguments": {},
+          "output": null
+        },
+        {
+          "tool_call_id": "YDfGgiTJoXTzQiQp",
+          "function_name": "file_edit",
+          "arguments": {},
+          "output": null
+        }
+      ]
+    },
+    {
+      "user_message": "don't pass boolean `True` into `clear_select_clause`. pass `clear_default=True` as the keyword argument.",
+      "agent_response": "I've updated the `clear_select_clause` call to use `clear_default=True` as a keyword argument.",
+      "agent_changes": "diff --git a/django/db/models/lookups.py b/django/db/models/lookups.py\nindex 866e38df83..1228d55add 100644\n--- a/django/db/models/lookups.py\n+++ b/django/db/models/lookups.py\n@@ -419,10 +419,22 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):\n         from django.db.models.sql.query import Query  # avoid circular import\n \n         if isinstance(self.rhs, Query):\n+            # If the query is already \"multi-valued\" then the columns will be\n+            # properly set and we don't need to do anything.\n+            if self.rhs._has_limited_fields:\n+                return super().get_prep_lookup()\n             self.rhs.clear_ordering(clear_default=True)\n+            # If the QuerySet is not limited to a single field, select the\n+            # primary key.\n             if not self.rhs.has_select_fields:\n                 self.rhs.clear_select_clause()\n                 self.rhs.add_fields([\"pk\"])\n+            # If the QuerySet has select_fields, ensure it's limited to 1.\n+            # This is important for .annotate().alias() cases.\n+            elif len(self.rhs.target_fields) > 1:\n+                # Clear all select fields including any from annotations.\n+                self.rhs.clear_select_clause(clear_default=True)\n+                self.rhs.add_fields([\"pk\"])\n         return super().get_prep_lookup()\n \n     def process_rhs(self, compiler, connection):\n",
+      "subtask_list": [
+        "Locate where the RHS subquery select fields and annotation masks are cleared during lookup processing in django/db/models/lookups.py.",
+        "Adjust the subquery selection clearing logic in django/db/models/sql/query.py so that `set_annotation_mask` accounts for aliases set after annotations.",
+        "Refine the annotation mask calculation to ensure alias attributes are stripped from the target select clause without discarding active annotation values."
+      ],
+      "tool_calls": [
+        {
+          "tool_call_id": "QmEXjJ7tzq1hBX44",
+          "function_name": "file_edit",
+          "arguments": {},
+          "output": null
+        }
+      ]
+    },
+    {
+      "user_message": "```json\n{\n    \"follow-up\": \"[DONE]\"\n}\n```",
+      "agent_response": "",
+      "agent_changes": ""
+    }
+  ],
+  "test_case": {
+    "problem_statement": "__in doesn't clear selected fields on the RHS when QuerySet.alias() is used after annotate().\nDescription\n\nHere is a test case to reproduce the bug, you can add this in tests/annotations/tests.py\n\tdef test_annotation_and_alias_filter_in_subquery(self):\n\t\tlong_books_qs = (\n\t\t\tBook.objects.filter(\n\t\t\t\tpages__gt=400,\n\t\t\t)\n\t\t\t.annotate(book_annotate=Value(1))\n\t\t\t.alias(book_alias=Value(1))\n\t\t)\n\t\tpublisher_books_qs = (\n\t\t\tPublisher.objects.filter(\n\t\t\t\tbook__in=long_books_qs\n\t\t\t)\n\t\t\t.values(\"name\")\n\t\t)\n\t\tself.assertCountEqual(\n\t\t\tpublisher_books_qs,\n\t\t\t[\n\t\t\t\t{'name': 'Apress'},\n\t\t\t\t{'name': 'Sams'},\n\t\t\t\t{'name': 'Prentice Hall'},\n\t\t\t\t{'name': 'Morgan Kaufmann'}\n\t\t\t]\n\t\t)\nYou should get this error:\ndjango.db.utils.OperationalError: sub-select returns 10 columns - expected 1\n\n"
+  },
+  "git_diff": "diff --git a/django/db/models/lookups.py b/django/db/models/lookups.py\nindex 866e38df83..1228d55add 100644\n--- a/django/db/models/lookups.py\n+++ b/django/db/models/lookups.py\n@@ -419,10 +419,22 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):\n         from django.db.models.sql.query import Query  # avoid circular import\n \n         if isinstance(self.rhs, Query):\n+            # If the query is already \"multi-valued\" then the columns will be\n+            # properly set and we don't need to do anything.\n+            if self.rhs._has_limited_fields:\n+                return super().get_prep_lookup()\n             self.rhs.clear_ordering(clear_default=True)\n+            # If the QuerySet is not limited to a single field, select the\n+            # primary key.\n             if not self.rhs.has_select_fields:\n                 self.rhs.clear_select_clause()\n                 self.rhs.add_fields([\"pk\"])\n+            # If the QuerySet has select_fields, ensure it's limited to 1.\n+            # This is important for .annotate().alias() cases.\n+            elif len(self.rhs.target_fields) > 1:\n+                # Clear all select fields including any from annotations.\n+                self.rhs.clear_select_clause(clear_default=True)\n+                self.rhs.add_fields([\"pk\"])\n         return super().get_prep_lookup()\n \n     def process_rhs(self, compiler, connection):\n",
+  "persona": "EXPERT_NITPICKER",
+  "coding_mode": "COLLABORATIVE",
+  "sim_model": "gemini/gemini-3.6-flash",
+  "agent_model": "google/gemini-2.5-flash",
+  "validation_model": "gemini/gemini-2.5-flash-lite",
+  "sim_usage": {
+    "input_tokens": 11803,
+    "output_tokens": 1072,
+    "cost_usd": 0.012872249999999998
+  },
+  "attempt": 0,
+  "agent_usage": {
+    "input_tokens": 3280,
+    "output_tokens": 149,
+    "cached_read_tokens": 78905,
+    "thought_tokens": 212,
+    "cached_write_tokens": null,
+    "cost_usd": 0.028741519999999996
+  },
+  "validation_usage": {
+    "input_tokens": 2456,
+    "output_tokens": 259,
+    "cost_usd": 0.0003492
+  }
+}

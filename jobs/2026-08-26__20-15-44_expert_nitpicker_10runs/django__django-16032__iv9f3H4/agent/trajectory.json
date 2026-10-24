@@ -1,0 +1,109 @@
+{
+  "schema_version": "ATIF-v1.7",
+  "session_id": "agent",
+  "agent": {
+    "name": "swe-dive-user-sim-acp/opencode",
+    "version": "1.18.23",
+    "model_name": "google/gemini-2.5-flash"
+  },
+  "steps": [
+    {
+      "step_id": 1,
+      "source": "user",
+      "message": "We're seeing `OperationalError: sub-select returns 10 columns - expected 1` when filtering with `__in` on a subquery that chains `alias()` after `annotate()`. Take a look at how `In` in `django/db/models/lookups.py` prepares the RHS subquery and clears select fields."
+    },
+    {
+      "step_id": 2,
+      "source": "agent",
+      "message": "I've updated the `In.get_prep_lookup` method in `django/db/models/lookups.py` to ensure that subqueries used with `__in` always return a single column, even when `annotate()` and `alias()` are used. This should prevent the `OperationalError`.",
+      "tool_calls": [
+        {
+          "tool_call_id": "F5DKrtVBep4H9CRx",
+          "function_name": "search",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "fXa2W3Qv94ilt0yv",
+          "function_name": "file_read",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "CTTN2A8sQxTRNO40",
+          "function_name": "file_edit",
+          "arguments": {}
+        }
+      ],
+      "observation": {
+        "results": [
+          {
+            "content": "diff --git a/django/db/models/lookups.py b/django/db/models/lookups.py\nindex 866e38df83..c7de6353a7 100644\n--- a/django/db/models/lookups.py\n+++ b/django/db/models/lookups.py\n@@ -419,10 +419,30 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):\n         from django.db.models.sql.query import Query  # avoid circular import\n \n         if isinstance(self.rhs, Query):\n+            # If the query is already \"multi-valued\" then the columns will be\n+            # properly set and we don't need to do anything.\n+            if self.rhs._has_limited_fields:\n+                return super().get_prep_lookup()\n             self.rhs.clear_ordering(clear_default=True)\n+            # If the QuerySet is not limited to a single field, select the\n+            # primary key.\n             if not self.rhs.has_select_fields:\n                 self.rhs.clear_select_clause()\n                 self.rhs.add_fields([\"pk\"])\n+            # If the QuerySet has select_fields, ensure it's limited to 1.\n+            # This is important for .annotate().alias() cases.\n+            elif len(self.rhs.target_fields) > 1:\n+                # Store any existing annotations that are not already selected.\n+                annotations = {}\n+                for alias, expression in self.rhs.query.annotations.items():\n+                    if alias not in self.rhs.query.select:\n+                        annotations[alias] = expression\n+                # Clear all select fields and add only the primary key.\n+                self.rhs.clear_select_clause()\n+                self.rhs.add_fields([\"pk\"])\n+                # Add back any original annotations.\n+                for alias, expression in annotations.items():\n+                    self.rhs.annotate(**{alias: expression})\n         return super().get_prep_lookup()\n \n     def process_rhs(self, compiler, connection):\n"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 3,
+      "source": "user",
+      "message": "don't re-add annotations using `self.rhs.annotate()` inside `get_prep_lookup`. just clear the select clause using `clear_select_clause(true)` directly on `self.rhs`."
+    },
+    {
+      "step_id": 4,
+      "source": "agent",
+      "message": "I've updated the `In.get_prep_lookup` method as requested. It now clears all select fields, including annotations, using `self.rhs.clear_select_clause(True)` when the subquery has multiple select fields, ensuring only the primary key is selected.",
+      "tool_calls": [
+        {
+          "tool_call_id": "VIGiktOF3ghurSx6",
+          "function_name": "file_read",
+          "arguments": {}
+        },
+        {
+          "tool_call_id": "YDfGgiTJoXTzQiQp",
+          "function_name": "file_edit",
+          "arguments": {}
+        }
+      ],
+      "observation": {
+        "results": [
+          {
+            "content": "diff --git a/django/db/models/lookups.py b/django/db/models/lookups.py\nindex 866e38df83..40773f3f37 100644\n--- a/django/db/models/lookups.py\n+++ b/django/db/models/lookups.py\n@@ -419,10 +419,22 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):\n         from django.db.models.sql.query import Query  # avoid circular import\n \n         if isinstance(self.rhs, Query):\n+            # If the query is already \"multi-valued\" then the columns will be\n+            # properly set and we don't need to do anything.\n+            if self.rhs._has_limited_fields:\n+                return super().get_prep_lookup()\n             self.rhs.clear_ordering(clear_default=True)\n+            # If the QuerySet is not limited to a single field, select the\n+            # primary key.\n             if not self.rhs.has_select_fields:\n                 self.rhs.clear_select_clause()\n                 self.rhs.add_fields([\"pk\"])\n+            # If the QuerySet has select_fields, ensure it's limited to 1.\n+            # This is important for .annotate().alias() cases.\n+            elif len(self.rhs.target_fields) > 1:\n+                # Clear all select fields including any from annotations.\n+                self.rhs.clear_select_clause(True)\n+                self.rhs.add_fields([\"pk\"])\n         return super().get_prep_lookup()\n \n     def process_rhs(self, compiler, connection):\n"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 5,
+      "source": "user",
+      "message": "don't pass boolean `True` into `clear_select_clause`. pass `clear_default=True` as the keyword argument."
+    },
+    {
+      "step_id": 6,
+      "source": "agent",
+      "message": "I've updated the `clear_select_clause` call to use `clear_default=True` as a keyword argument.",
+      "tool_calls": [
+        {
+          "tool_call_id": "QmEXjJ7tzq1hBX44",
+          "function_name": "file_edit",
+          "arguments": {}
+        }
+      ],
+      "observation": {
+        "results": [
+          {
+            "content": "diff --git a/django/db/models/lookups.py b/django/db/models/lookups.py\nindex 866e38df83..1228d55add 100644\n--- a/django/db/models/lookups.py\n+++ b/django/db/models/lookups.py\n@@ -419,10 +419,22 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):\n         from django.db.models.sql.query import Query  # avoid circular import\n \n         if isinstance(self.rhs, Query):\n+            # If the query is already \"multi-valued\" then the columns will be\n+            # properly set and we don't need to do anything.\n+            if self.rhs._has_limited_fields:\n+                return super().get_prep_lookup()\n             self.rhs.clear_ordering(clear_default=True)\n+            # If the QuerySet is not limited to a single field, select the\n+            # primary key.\n             if not self.rhs.has_select_fields:\n                 self.rhs.clear_select_clause()\n                 self.rhs.add_fields([\"pk\"])\n+            # If the QuerySet has select_fields, ensure it's limited to 1.\n+            # This is important for .annotate().alias() cases.\n+            elif len(self.rhs.target_fields) > 1:\n+                # Clear all select fields including any from annotations.\n+                self.rhs.clear_select_clause(clear_default=True)\n+                self.rhs.add_fields([\"pk\"])\n         return super().get_prep_lookup()\n \n     def process_rhs(self, compiler, connection):\n"
+          }
+        ]
+      }
+    },
+    {
+      "step_id": 7,
+      "source": "user",
+      "message": "```json\n{\n    \"follow-up\": \"[DONE]\"\n}\n```"
+    }
+  ],
+  "final_metrics": {
+    "total_prompt_tokens": 11803,
+    "total_completion_tokens": 1072,
+    "total_cost_usd": 0.012872249999999998,
+    "total_steps": 7
+  }
+}

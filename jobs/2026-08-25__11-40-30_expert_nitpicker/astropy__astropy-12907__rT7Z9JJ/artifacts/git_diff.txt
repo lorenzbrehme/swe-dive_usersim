@@ -1,0 +1,31 @@
+diff --git a/astropy/modeling/core.py b/astropy/modeling/core.py
+index da4352cb0..eca51416c 100755
+--- a/astropy/modeling/core.py
++++ b/astropy/modeling/core.py
+@@ -3619,7 +3619,6 @@ class CompoundModel(Model):
+                 else:
+                     inputs_map[inp] = self.left, inp
+         return inputs_map
+-
+     def _parameter_units_for_data_units(self, input_units, output_units):
+         if self._leaflist is None:
+             self._map_parameters()
+diff --git a/astropy/modeling/separable.py b/astropy/modeling/separable.py
+index a308e2729..b720a1007 100755
+--- a/astropy/modeling/separable.py
++++ b/astropy/modeling/separable.py
+@@ -237,12 +237,12 @@ def _cstack(left, right):
+         cleft = _coord_matrix(left, 'left', noutp)
+     else:
+         cleft = np.zeros((noutp, left.shape[1]))
+-        cleft[: left.shape[0], : left.shape[1]] = left
++        cleft[: left.shape[0], :] = left
+     if isinstance(right, Model):
+         cright = _coord_matrix(right, 'right', noutp)
+     else:
+         cright = np.zeros((noutp, right.shape[1]))
+-        cright[-right.shape[0]:, -right.shape[1]:] = 1
++        cright[-right.shape[0]:, :] = right
+ 
+     return np.hstack([cleft, cright])
+ 

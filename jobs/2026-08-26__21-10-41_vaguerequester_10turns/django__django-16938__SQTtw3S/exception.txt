@@ -1,0 +1,40 @@
+Traceback (most recent call last):
+  File "/mnt/qt-qe-mt-bench/swe-dive/.venv/lib/python3.13/site-packages/harbor/trial/single_step.py", line 71, in _run_agent
+    await self._run_agent_phase(
+    ...<4 lines>...
+    )
+  File "/mnt/qt-qe-mt-bench/swe-dive/.venv/lib/python3.13/site-packages/harbor/trial/trial.py", line 424, in _run_agent_phase
+    await asyncio.wait_for(
+    ...<6 lines>...
+    )
+  File "/usr/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/mnt/qt-qe-mt-bench/swe-dive/.venv/lib/python3.13/site-packages/harbor/agents/installed/base.py", line 52, in wrapper
+    return await fn(self, instruction, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/qt-qe-mt-bench/swe-dive/swe_dive/harbor_agents/user_sim_agent.py", line 736, in run
+    await self.exec_as_agent(
+    ...<12 lines>...
+    )
+  File "/mnt/qt-qe-mt-bench/swe-dive/.venv/lib/python3.13/site-packages/harbor/agents/installed/base.py", line 412, in exec_as_agent
+    return await self._exec(
+           ^^^^^^^^^^^^^^^^^
+        environment, command, env=env, cwd=cwd, timeout_sec=timeout_sec
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/qt-qe-mt-bench/swe-dive/.venv/lib/python3.13/site-packages/harbor/agents/installed/base.py", line 379, in _exec
+    raise self._classify_exec_error(command, result)
+harbor.agents.installed.base.NonZeroAgentExitCodeError: Command failed (exit 1): /opt/harbor-acp-venv/bin/python -m swe_dive.sandbox.orchestrator --backend acp --instruction-file /logs/agent/instruction.md --workdir /testbed --log-dir /logs/agent --acp-launcher /installed-agent/acp-launch.sh --acp-runner-dir /installed-agent --persona Vague_Requester --coding-mode COLLABORATIVE --max-turns 10 --max-retries 2 --sim-model gemini/gemini-3.6-flash --validation-model gemini/gemini-2.5-flash-lite --agent-model google/gemini-2.5-flash 2>&1 | tee /logs/agent/orchestrator.txt
+stdout: ── Turn 1/10 ──  message: Serialization of m2m relations is throwing `FieldError: Field cannot be both deferred and traversed using select_related at the same time` when the target model uses a custom manager with select_related. Can you fix m2m serialization so it clears select_related or handles custom managers properly?
+[thought] **Analyzing the Serialization Conflict**
+
+I'm now diving into the root cause of the `FieldError` with m2m serialization. The issue seems to stem from mixing `defer()` (or `only()`) with `select_related()` on a model with a custom manager. My initial hypothesis centers around how Django handles these conflicting optimizations during serialization, especially when navigating the m2m relationship. I'm exploring the object graph traversal and the potential for a clash in how fields are accessed.
+
+
+
+[thought] **Investigating the Conflict Source**
+
+I've narrowed down the conflict's origin to the intersection of custom managers, `select_related`, and m2m serializa ... [truncated]
+stderr: None

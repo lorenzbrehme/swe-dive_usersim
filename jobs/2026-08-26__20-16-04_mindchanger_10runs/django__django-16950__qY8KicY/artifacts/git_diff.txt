@@ -1,0 +1,18 @@
+diff --git a/django/forms/models.py b/django/forms/models.py
+index 3fa04b821f..fcb809f49f 100644
+--- a/django/forms/models.py
++++ b/django/forms/models.py
+@@ -359,6 +359,13 @@ class BaseModelForm(BaseForm, AltersData):
+         if instance is None:
+             # if we didn't get an instance, instantiate a new one
+             self.instance = opts.model()
++            # If the primary key is a field with a default value (e.g., UUIDField),
++            # ensure it's populated for new instances before inline formsets
++            # are created.
++            for field in opts.model._meta.concrete_fields:
++                if field.has_default() and getattr(self.instance, field.attname) is None:
++                    default_value = field.get_default()
++                    setattr(self.instance, field.attname, default_value)
+             object_data = {}
+         else:
+             self.instance = instance

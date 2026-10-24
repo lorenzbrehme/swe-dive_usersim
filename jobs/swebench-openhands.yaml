@@ -1,0 +1,17 @@
+# Credentials: set LLM_MODEL, OPENAI_API_KEY (etc.) in your shell before running.
+datasets:
+  - name: swe-bench/swe-bench-verified
+    n_tasks: 5
+
+agents:
+  - name: swe-dive-user-sim-openhands
+    import_path: swe_dive.harbor_agents.user_sim_agent:UserSimOpenHandsAgent
+    kwargs:
+      persona: EXPERT_NITPICKER
+      coding_mode: COLLABORATIVE
+      max_turns: 10
+      sim_model: gemini/gemini-2.5-flash
+      validation_model: gemini/gemini-2.5-flash-lite
+      agent_model: gemini/gemini-2.5-flash
+
+n_concurrent_trials: 4

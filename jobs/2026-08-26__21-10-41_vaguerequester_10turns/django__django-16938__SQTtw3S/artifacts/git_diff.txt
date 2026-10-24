@@ -1,0 +1,91 @@
+diff --git a/django/core/serializers/python.py b/django/core/serializers/python.py
+index 36048601af..d5358427fd 100644
+--- a/django/core/serializers/python.py
++++ b/django/core/serializers/python.py
+@@ -79,7 +79,7 @@ class Serializer(base.Serializer):
+                     return self._value_from_field(value, value._meta.pk)
+ 
+                 def queryset_iterator(obj, field):
+-                    return getattr(obj, field.name).only("pk").iterator()
++                    return getattr(obj, field.name).all().select_related(None).only("pk").iterator()
+ 
+             m2m_iter = getattr(obj, "_prefetched_objects_cache", {}).get(
+                 field.name,
+diff --git a/django/core/serializers/xml_serializer.py b/django/core/serializers/xml_serializer.py
+index 1d3269c41a..25f67942ac 100644
+--- a/django/core/serializers/xml_serializer.py
++++ b/django/core/serializers/xml_serializer.py
+@@ -155,7 +155,7 @@ class Serializer(base.Serializer):
+                     self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
+ 
+                 def queryset_iterator(obj, field):
+-                    return getattr(obj, field.name).only("pk").iterator()
++                    return getattr(obj, field.name).all().select_related(None).only("pk").iterator()
+ 
+             m2m_iter = getattr(obj, "_prefetched_objects_cache", {}).get(
+                 field.name,
+diff --git a/tests/serializers/models/base.py b/tests/serializers/models/base.py
+index af9ca2b20a..e4f77a82eb 100644
+--- a/tests/serializers/models/base.py
++++ b/tests/serializers/models/base.py
+@@ -9,7 +9,13 @@ from decimal import Decimal
+ from django.db import models
+ 
+ 
++class MetaDataDetail(models.Model):
++    name = models.CharField(max_length=10)
++
+ class CategoryMetaDataManager(models.Manager):
++    def get_queryset(self):
++        return super().get_queryset().select_related('detail')
++
+     def get_by_natural_key(self, kind, name):
+         return self.get(kind=kind, name=name)
+ 
+@@ -18,6 +24,7 @@ class CategoryMetaData(models.Model):
+     kind = models.CharField(max_length=10)
+     name = models.CharField(max_length=10)
+     value = models.CharField(max_length=10)
++    detail = models.ForeignKey(MetaDataDetail, models.CASCADE, null=True, default=None)
+     objects = CategoryMetaDataManager()
+ 
+     class Meta:
+diff --git a/tests/serializers/tests.py b/tests/serializers/tests.py
+index 67ae8f43de..3460431be5 100644
+--- a/tests/serializers/tests.py
++++ b/tests/serializers/tests.py
+@@ -6,6 +6,7 @@ from unittest import mock, skipIf
+ from django.core import serializers
+ from django.core.serializers import SerializerDoesNotExist
+ from django.core.serializers.base import ProgressBar
++from django.core.exceptions import FieldError
+ from django.db import connection, transaction
+ from django.http import HttpResponse
+ from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
+@@ -317,6 +318,26 @@ class SerializersTestBase:
+         deserial_objs = list(serializers.deserialize(self.serializer_name, serial_str))
+         self.assertIsInstance(deserial_objs[0].object, Author)
+ 
++    def test_m2m_serialization_with_custom_manager_select_related(self):
++        # This test ensures that m2m serialization works correctly when the
++        # target model uses a custom manager with select_related, and does
++        # not raise FieldError due to deferred fields conflicting with
++        # select_related.
++        from datetime import datetime
++        from serializers.models.base import Article, CategoryMetaData, Author, MetaDataDetail
++
++        detail = MetaDataDetail.objects.create(name="detail1")
++        meta_data_1 = CategoryMetaData.objects.create(kind="k1", name="n1", value="v1", detail=detail)
++        meta_data_2 = CategoryMetaData.objects.create(kind="k2", name="n2", value="v2", detail=detail)
++        author = Author.objects.create(name="John Doe")
++        article = Article.objects.create(author=author, headline="Article 1", pub_date=datetime.now())
++        article.meta_data.add(meta_data_1, meta_data_2)
++
++        try:
++            serializers.serialize(self.serializer_name, Article.objects.all())
++        except FieldError as e:
++            self.fail(f"Serialization raised FieldError: {e}")
++
+     def test_custom_field_serialization(self):
+         """Custom fields serialize and deserialize intact"""
+         team_str = "Spartak Moskva"

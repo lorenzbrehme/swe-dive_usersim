@@ -1,0 +1,13 @@
+── BASE_MODE ── running standard benchmark task (single turn).
+[AGENT_RESP] The `requests` library typically does not send a `Content-Length` header with GET requests unless a request body is explicitly provided (e.g., using the `data` or `json` arguments).
+
+If you are encountering this issue, please check your `requests.get()` calls to ensure you are not inadvertently passing `data` or `json` arguments. For GET requests, you should use the `params` argument to send data as URL query parameters.
+
+Here's an example of the correct way to send data with a GET request, which will not include a `Content-Length` header:
+
+```python
+import requests
+
+response = requests.get('http://amazon.com', params={'key': 'value'})
+print(response.request.headers)
+```

@@ -1,0 +1,23 @@
+diff --git a/lib/matplotlib/axis.py b/lib/matplotlib/axis.py
+index 2bb9e4158..2512f692b 100644
+--- a/lib/matplotlib/axis.py
++++ b/lib/matplotlib/axis.py
+@@ -1096,8 +1096,7 @@ class Axis(martist.Artist):
+         ticks = [*major_ticks, *minor_ticks]
+ 
+         view_low, view_high = self.get_view_interval()
+-        if view_low > view_high:
+-            view_low, view_high = view_high, view_low
++        # No change here, view_low and view_high should maintain their order
+ 
+         if self._smart_bounds and ticks:
+             # handle inverted limits
+@@ -1129,7 +1128,7 @@ class Axis(martist.Artist):
+                     ihigh = locs[-1]
+             ticks = [tick for tick in ticks if ilow <= tick.get_loc() <= ihigh]
+ 
+-        interval_t = self.get_transform().transform([view_low, view_high])
++        interval_t = sorted(self.get_transform().transform([view_low, view_high]))
+ 
+         ticks_to_draw = []
+         for tick in ticks:
